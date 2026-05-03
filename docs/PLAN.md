@@ -81,15 +81,21 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 2. `vite.config.ts` `base` set to the repo path.
 3. Smoke-test the deployed bundle.
 
+## Backlog (discovered during Phase 2)
+- **Physical adept powers**: Adepts have Magic attribute modeled but powers (Improved Reflexes, Killing Hands, etc.) are not purchased from resources yet — adept resource spend is identical to mundane archetypes. Defer to a post-v1 enhancement or Phase 4 tuning pass.
+- **Combat mage vs mage differentiation**: Both currently produce nearly identical characters (same priority layout, same spell selection). The archetypes.json `coreSkills` and spell-picking logic need separate handling for combat mage (combat-focused spells, higher Body/Willpower weights). Defer to archetype tuning pass.
+- **Archetype tuning**: Priority bias and attribute weight values in `archetypes.json` were set by intuition; a tuning pass against canonical SR2 archetype stats would improve fidelity.
+
 ## Status
 
-**Phase 1 complete** (2026-05-03). All 7 JSON files in `data/sr2/` validate against schemas and build cleanly. Ready to start Phase 2 — Generator Engine.
+**Phase 2 complete** (2026-05-03). All engine stages implemented and tested. 9000 generated characters (1000 per archetype) all pass `validate()`. Determinism, re-roll isolation, archetype distributions, and magic/cyberware constraints all verified.
 
-**Known gaps carried into Phase 2:**
-- Weapon Ratings Table damage codes partially mangled by OCR — manually supplemented but should be cross-checked during engine validation against canonical archetype stats
-- Spell list covers combat + detection + key health/illusion/manipulation spells; full health/illusion/manipulation spells on pages 164–168 not yet extracted (enough to proceed)
-- Physical Adept powers not yet extracted (needed for full physad support in Phase 2)
-- Archetype "Soldier" and "Ganger" canonical builds present in book but not mapped to our 9 archetypes — intentional omission
+**Key decisions made in Phase 2:**
+- `pickMetatype` decoupled from priorities — uses archetype `preferredMetatypes` probability weights directly; `assignPriorities` enforces race=A constraint after the fact
+- `assignPriorities` assigns most-constrained category first to avoid level collisions (e.g. human adept needing magic=B)
+- Full magicians only get spells; adepts get cyberware/gear path (adept powers not yet modeled)
+
+**Next:** Phase 3 — Quiz → Intent mapping.
 
 ## Risks & mitigations
 - **OCR quality on a 71MB scanned PDF**: mitigated by 400dpi, `--psm 1`, and per-section manual review. Tables (priority, gear, spells) are highest risk; budget hand-transcription time for those.
