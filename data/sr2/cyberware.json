@@ -1,0 +1,33 @@
+{
+  "cyberware": [
+    { "id": "datajack",          "name": "Datajack",            "category": "headware", "essenceCost": 0.2, "costNuyen": 1000,   "effect": "Universal input/output port for headware/bodyware." },
+    { "id": "chipjack",          "name": "Chipjack",            "category": "headware", "essenceCost": 0.1, "costNuyen": 1000,   "effect": "Accepts skillsoft/datasoft chips." },
+    { "id": "radio_twoway",      "name": "Radio (two-way)",     "category": "headware", "essenceCost": 0.2, "costNuyen": 4000,   "effect": "Full-band limited-range headware communications." },
+    { "id": "radio_receive",     "name": "Radio (receiver only)","category": "headware", "essenceCost": 0.1, "costNuyen": 2000,  "effect": "Receive-only headware radio." },
+    { "id": "telephone",         "name": "Telephone",           "category": "headware", "essenceCost": 0.2, "costNuyen": 3700,   "effect": "Headware access to telenet." },
+    { "id": "synthlink",         "name": "Synthlink",           "category": "headware", "essenceCost": 0.1, "costNuyen": 1000,   "effect": "Datajack variant for cybernetic music synthesizer use." },
+    { "id": "cybereyes",         "name": "Cybereyes",           "category": "senseware","essenceCost": 0.5, "costNuyen": 5000,   "effect": "Cyber replacement eyes, 20/20 baseline; accepts up to 0.5 additional Essence of enhancements.", "rating": false },
+    { "id": "cyberears",         "name": "Cyberears",           "category": "senseware","essenceCost": 0.3, "costNuyen": 4000,   "effect": "Cyber replacement ears, perfect hearing baseline; accepts minor modifications." },
+    { "id": "low_light_vision",  "name": "Low-Light Vision",    "category": "senseware","essenceCost": 0.2, "costNuyen": 3000,   "effect": "Cybereye/retinal mod: see clearly in near-darkness." },
+    { "id": "thermographic_vision","name": "Thermographic Vision","category": "senseware","essenceCost": 0.2,"costNuyen": 3000,  "effect": "Cybereye/retinal mod: see infrared heat signatures." },
+    { "id": "smartlink",         "name": "Smartlink",           "category": "bodyware", "essenceCost": 0.5, "costNuyen": 2500,   "effect": "Targeting dot on retina/cybereye linked to smartgun. Removes off-hand penalty; adds dice to ranged attacks." },
+    { "id": "wired_reflexes_1",  "name": "Wired Reflexes 1",    "category": "bodyware", "essenceCost": 2.0, "costNuyen": 55000,  "effect": "Neural boosters: +2 Reaction, +1D6 Initiative die." },
+    { "id": "wired_reflexes_2",  "name": "Wired Reflexes 2",    "category": "bodyware", "essenceCost": 3.0, "costNuyen": 165000, "effect": "Neural boosters: +4 Reaction, +2D6 Initiative dice." },
+    { "id": "wired_reflexes_3",  "name": "Wired Reflexes 3",    "category": "bodyware", "essenceCost": 5.0, "costNuyen": 500000, "effect": "Neural boosters: +6 Reaction, +3D6 Initiative dice." },
+    { "id": "muscle_replacement_1","name": "Muscle Replacement 1","category": "bodyware","essenceCost": 1.0,"costNuyen": 20000,  "effect": "+1 Strength, +1 Quickness (does not affect Reaction).", "rating": true, "maxRating": 4 },
+    { "id": "muscle_replacement_2","name": "Muscle Replacement 2","category": "bodyware","essenceCost": 2.0,"costNuyen": 40000,  "effect": "+2 Strength, +2 Quickness.", "rating": true, "maxRating": 4 },
+    { "id": "muscle_replacement_3","name": "Muscle Replacement 3","category": "bodyware","essenceCost": 3.0,"costNuyen": 60000,  "effect": "+3 Strength, +3 Quickness.", "rating": true, "maxRating": 4 },
+    { "id": "muscle_replacement_4","name": "Muscle Replacement 4","category": "bodyware","essenceCost": 4.0,"costNuyen": 80000,  "effect": "+4 Strength, +4 Quickness.", "rating": true, "maxRating": 4 },
+    { "id": "dermal_plating_1",  "name": "Dermal Plating 1",    "category": "bodyware", "essenceCost": 1.0, "costNuyen": 6000,   "effect": "+1 Body for damage resistance. Invasive, obvious." },
+    { "id": "dermal_plating_2",  "name": "Dermal Plating 2",    "category": "bodyware", "essenceCost": 2.0, "costNuyen": 15000,  "effect": "+2 Body for damage resistance." },
+    { "id": "dermal_plating_3",  "name": "Dermal Plating 3",    "category": "bodyware", "essenceCost": 3.0, "costNuyen": 45000,  "effect": "+3 Body for damage resistance." },
+    { "id": "skillwires_1",      "name": "Skillwires 1",        "category": "bodyware", "essenceCost": 1.0, "costNuyen": 10000,  "effect": "Neuro-muscular controllers for ActiveSofts. Rating limits total ActiveSoft rating in use.", "rating": true, "maxRating": 9 },
+    { "id": "vehicle_control_rig_1","name":"Vehicle Control Rig 1","category":"bodyware","essenceCost": 3.0,"costNuyen": 12000,  "effect": "+2 Reaction while rigging, +1D6 Initiative when controlling via datajack." },
+    { "id": "vehicle_control_rig_2","name":"Vehicle Control Rig 2","category":"bodyware","essenceCost": 4.0,"costNuyen": 60000,  "effect": "+4 Reaction while rigging, +2D6 Initiative when controlling via datajack." },
+    { "id": "vehicle_control_rig_3","name":"Vehicle Control Rig 3","category":"bodyware","essenceCost": 5.0,"costNuyen": 300000, "effect": "+6 Reaction while rigging, +3D6 Initiative when controlling via datajack." },
+    { "id": "hand_razors",       "name": "Hand Razors",         "category": "cyberweapon","essenceCost": 0.3,"costNuyen": 4500,  "effect": "2.5cm blades replacing fingernails. Unarmed combat weapon.", "notes": "Retractable version 9,000¥." },
+    { "id": "spur",              "name": "Spur",                "category": "cyberweapon","essenceCost": 0.5,"costNuyen": 7000,  "effect": "Bone-anchored blade. Retractable version 11,500¥." },
+    { "id": "cyberarm",          "name": "Cyberarm (replacement)","category":"cyberlimp","essenceCost": 1.0,"costNuyen": 50000,  "effect": "Full arm replacement, no special abilities. Pair counts as 1 level dermal armor." },
+    { "id": "cyberleg",          "name": "Cyberleg (replacement)","category":"cyberlimp","essenceCost": 1.0,"costNuyen": 50000,  "effect": "Full leg replacement, no special abilities. Pair counts as 1 level dermal armor." }
+  ]
+}

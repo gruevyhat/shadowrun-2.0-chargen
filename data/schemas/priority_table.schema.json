@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "priority_table.schema.json",
+  "title": "SR2 Priority Table",
+  "type": "object",
+  "required": ["priorities"],
+  "additionalProperties": false,
+  "properties": {
+    "priorities": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["level", "race", "magic", "attributes", "skills", "resources"],
+        "additionalProperties": false,
+        "properties": {
+          "level": { "type": "string", "enum": ["A", "B", "C", "D", "E"] },
+          "race": {
+            "type": "object",
+            "required": ["allowsMetahuman"],
+            "additionalProperties": false,
+            "properties": {
+              "allowsMetahuman": { "type": "boolean" }
+            }
+          },
+          "magic": {
+            "type": "object",
+            "required": ["fullMagicianHuman", "fullMagicianMeta", "adeptHuman", "adeptMeta"],
+            "additionalProperties": false,
+            "properties": {
+              "fullMagicianHuman": { "type": "boolean" },
+              "fullMagicianMeta":  { "type": "boolean" },
+              "adeptHuman":        { "type": "boolean" },
+              "adeptMeta":         { "type": "boolean" }
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "required": ["points"],
+            "additionalProperties": false,
+            "properties": {
+              "points": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "skills": {
+            "type": "object",
+            "required": ["points"],
+            "additionalProperties": false,
+            "properties": {
+              "points": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "resources": {
+            "type": "object",
+            "required": ["nuyen", "forcePoints"],
+            "additionalProperties": false,
+            "properties": {
+              "nuyen":       { "type": "integer", "minimum": 0 },
+              "forcePoints": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

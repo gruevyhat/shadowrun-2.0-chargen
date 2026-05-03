@@ -1,0 +1,44 @@
+{
+  "priorities": [
+    {
+      "level": "A",
+      "race":       { "allowsMetahuman": true },
+      "magic":      { "fullMagicianHuman": true,  "fullMagicianMeta": false, "adeptHuman": false, "adeptMeta": false },
+      "attributes": { "points": 30 },
+      "skills":     { "points": 40 },
+      "resources":  { "nuyen": 1000000, "forcePoints": 50 }
+    },
+    {
+      "level": "B",
+      "race":       { "allowsMetahuman": false },
+      "magic":      { "fullMagicianHuman": false, "fullMagicianMeta": true,  "adeptHuman": true,  "adeptMeta": false },
+      "attributes": { "points": 24 },
+      "skills":     { "points": 30 },
+      "resources":  { "nuyen": 400000, "forcePoints": 35 }
+    },
+    {
+      "level": "C",
+      "race":       { "allowsMetahuman": false },
+      "magic":      { "fullMagicianHuman": false, "fullMagicianMeta": false, "adeptHuman": false, "adeptMeta": true },
+      "attributes": { "points": 20 },
+      "skills":     { "points": 24 },
+      "resources":  { "nuyen": 90000, "forcePoints": 25 }
+    },
+    {
+      "level": "D",
+      "race":       { "allowsMetahuman": false },
+      "magic":      { "fullMagicianHuman": false, "fullMagicianMeta": false, "adeptHuman": false, "adeptMeta": false },
+      "attributes": { "points": 17 },
+      "skills":     { "points": 20 },
+      "resources":  { "nuyen": 5000, "forcePoints": 15 }
+    },
+    {
+      "level": "E",
+      "race":       { "allowsMetahuman": false },
+      "magic":      { "fullMagicianHuman": false, "fullMagicianMeta": false, "adeptHuman": false, "adeptMeta": false },
+      "attributes": { "points": 15 },
+      "skills":     { "points": 17 },
+      "resources":  { "nuyen": 500, "forcePoints": 5 }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "archetypes.schema.json",
+  "title": "SR2 Archetype Templates",
+  "type": "object",
+  "required": ["archetypes"],
+  "additionalProperties": false,
+  "properties": {
+    "archetypes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "magicDisposition", "priorityBias", "attributeWeights", "coreSkills", "gearTags"],
+        "additionalProperties": false,
+        "properties": {
+          "id":   { "type": "string" },
+          "name": { "type": "string" },
+          "magicDisposition": { "type": "string", "enum": ["full_magic", "adept", "mundane"] },
+          "preferredMetatypes": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "priorityBias": {
+            "description": "Preferred priority level per category. A=4, B=3, C=2, D=1, E=0 in terms of desirability.",
+            "type": "object",
+            "required": ["race", "magic", "attributes", "skills", "resources"],
+            "additionalProperties": false,
+            "properties": {
+              "race":       { "type": "integer", "minimum": 0, "maximum": 4 },
+              "magic":      { "type": "integer", "minimum": 0, "maximum": 4 },
+              "attributes": { "type": "integer", "minimum": 0, "maximum": 4 },
+              "skills":     { "type": "integer", "minimum": 0, "maximum": 4 },
+              "resources":  { "type": "integer", "minimum": 0, "maximum": 4 }
+            }
+          },
+          "attributeWeights": {
+            "description": "Relative weight 0–10 for how many attribute points go to each attribute.",
+            "type": "object",
+            "required": ["body", "quickness", "strength", "charisma", "intelligence", "willpower"],
+            "additionalProperties": false,
+            "properties": {
+              "body":        { "type": "integer", "minimum": 0, "maximum": 10 },
+              "quickness":   { "type": "integer", "minimum": 0, "maximum": 10 },
+              "strength":    { "type": "integer", "minimum": 0, "maximum": 10 },
+              "charisma":    { "type": "integer", "minimum": 0, "maximum": 10 },
+              "intelligence":{ "type": "integer", "minimum": 0, "maximum": 10 },
+              "willpower":   { "type": "integer", "minimum": 0, "maximum": 10 }
+            }
+          },
+          "coreSkills": {
+            "description": "Skill IDs the archetype prioritizes, in rough order of importance.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "gearTags": {
+            "description": "Gear category tags the archetype favors when spending resources.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

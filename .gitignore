@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+
+# Node
+app/node_modules/
+app/dist/
+
+# OS
+.DS_Store
+
+# Local Claude settings
+.claude/settings.local.json
+
+# OCR intermediates (regenerable from source PDFs)
+data/raw/
+
+# Source PDFs (large binaries; store separately)
+docs/**/*.pdf

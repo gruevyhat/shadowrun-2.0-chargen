@@ -1,0 +1,43 @@
+{
+  "spells": [
+    { "id": "fireball",         "name": "Fireball",          "category": "combat",      "type": "physical", "target": "Body (R)",      "drainCode": "[(F/2)+3]D",  "notes": "Area-effect. Can ignite combustibles." },
+    { "id": "hellblast",        "name": "Hellblast",         "category": "combat",      "type": "physical", "target": "Body (R)",      "drainCode": "[(F/2)+6]D",  "notes": "Area-effect, Deadly damage. Can ignite combustibles." },
+    { "id": "mana_bolt",        "name": "Mana Bolt",         "category": "combat",      "type": "mana",     "target": "Willpower (R)", "drainCode": "(F/2)S",      "notes": "Serious damage bolt vs. living targets." },
+    { "id": "mana_dart",        "name": "Mana Dart",         "category": "combat",      "type": "mana",     "target": "Willpower (R)", "drainCode": "(F/2)L" },
+    { "id": "mana_missile",     "name": "Mana Missile",      "category": "combat",      "type": "mana",     "target": "Willpower (R)", "drainCode": "(F/2)M" },
+    { "id": "manaball",         "name": "Manaball",          "category": "combat",      "type": "mana",     "target": "Willpower (R)", "drainCode": "(F/2)S",      "notes": "Area-effect. Affects only living targets." },
+    { "id": "power_bolt",       "name": "Power Bolt",        "category": "combat",      "type": "physical", "target": "Body (R)",      "drainCode": "[(F/2)+1]S" },
+    { "id": "power_dart",       "name": "Power Dart",        "category": "combat",      "type": "physical", "target": "Body (R)",      "drainCode": "[(F/2)+1]L" },
+    { "id": "power_missile",    "name": "Power Missile",     "category": "combat",      "type": "physical", "target": "Body (R)",      "drainCode": "[(F/2)+1]M" },
+    { "id": "powerball",        "name": "Powerball",         "category": "combat",      "type": "physical", "target": "Body (R)",      "drainCode": "[(F/2)+1]S",  "notes": "Area-effect version of Power Bolt." },
+    { "id": "ram",              "name": "Ram",               "category": "combat",      "type": "physical", "target": "Object Resistance", "drainCode": "[(F/2)+1]S", "notes": "Damages inanimate targets and vehicles only." },
+    { "id": "sleep",            "name": "Sleep",             "category": "combat",      "type": "mana",     "target": "Willpower (R)", "drainCode": "[(F/2)-1]S",  "notes": "Area-effect, Stun damage only, living targets only." },
+
+    { "id": "analyze_device",   "name": "Analyze Device",   "category": "detection",   "type": "physical", "target": "Object",        "drainCode": "[(F/2)+1]M",  "notes": "Reveals purpose and basic operation of device." },
+    { "id": "analyze_truth",    "name": "Analyze Truth",    "category": "detection",   "type": "mana",     "target": "Willpower (R)", "drainCode": "(F/2)S",      "notes": "Determines if target's statement is true." },
+    { "id": "clairvoyance",     "name": "Clairvoyance",     "category": "detection",   "type": "mana",     "target": "4",             "drainCode": "(F/2)M",      "notes": "See distant scenes. Cannot cast spells at targets seen this way." },
+    { "id": "clairaudience",    "name": "Clairaudience",    "category": "detection",   "type": "mana",     "target": "4",             "drainCode": "(F/2)M",      "notes": "Hear distant sounds." },
+    { "id": "combat_sense",     "name": "Combat Sense",     "category": "detection",   "type": "physical", "target": "4",             "drainCode": "[(F/2)+1]S",  "notes": "Every 2 successes adds 1 to subject's Combat Pool." },
+    { "id": "detect_enemies",   "name": "Detect Enemies",   "category": "detection",   "type": "mana",     "target": "4",             "drainCode": "[(F/2)+1]M",  "notes": "Area-effect. Detects beings with hostile intent toward subject." },
+    { "id": "detect_life",      "name": "Detect Life",      "category": "detection",   "type": "mana",     "target": "4",             "drainCode": "(F/2)L",      "notes": "Area-effect. Detects all living beings, number and position." },
+    { "id": "detect_object",    "name": "Detect (Object)",  "category": "detection",   "type": "physical", "target": "4",             "drainCode": "[(F/2)+1]M",  "notes": "Area-effect. Detects specified type of target. Each variant is a separate spell." },
+    { "id": "mind_probe",       "name": "Mind Probe",       "category": "detection",   "type": "mana",     "target": "4 (R)",         "drainCode": "[(F/2)+2]D",  "notes": "Touch range. Read surface thoughts (1 success), probe for knowledge (2), subconscious (3+)." },
+
+    { "id": "heal",             "name": "Heal",             "category": "health",      "type": "mana",     "target": "Damage Level",  "drainCode": "(F/2)varies", "notes": "Heals Stun or Physical damage. Drain = damage level healed." },
+    { "id": "treat",            "name": "Treat",            "category": "health",      "type": "mana",     "target": "4",             "drainCode": "(F/2)M",      "notes": "Accelerates natural healing." },
+    { "id": "antidote",         "name": "Antidote",         "category": "health",      "type": "mana",     "target": "Toxin Power",   "drainCode": "(F/2)M",      "notes": "Counters poison/toxin effects." },
+    { "id": "hibernate",        "name": "Hibernate",        "category": "health",      "type": "mana",     "target": "4",             "drainCode": "(F/2)S",      "notes": "Puts subject into hibernation state; can survive without food/water." },
+
+    { "id": "chaos",            "name": "Chaos",            "category": "illusion",    "type": "mana",     "target": "Willpower (R)", "drainCode": "(F/2)M",      "notes": "Area-effect. Targets cannot distinguish friend from foe." },
+    { "id": "confusion",        "name": "Confusion",        "category": "illusion",    "type": "mana",     "target": "Willpower (R)", "drainCode": "(F/2)M",      "notes": "Target acts randomly." },
+    { "id": "entertainment",    "name": "Entertainment",    "category": "illusion",    "type": "mana",     "target": "4",             "drainCode": "(F/2)L",      "notes": "Creates an entertaining scene/image." },
+    { "id": "mask",             "name": "Mask",             "category": "illusion",    "type": "physical", "target": "4",             "drainCode": "(F/2)M",      "notes": "Makes subject appear as someone else. Photographic quality." },
+    { "id": "silence",          "name": "Silence",          "category": "illusion",    "type": "physical", "target": "4",             "drainCode": "(F/2)M",      "notes": "Area-effect. No sound within zone." },
+
+    { "id": "levitate",         "name": "Levitate",         "category": "manipulation","type": "physical", "target": "Object/Body (R)","drainCode":"[(F/2)+1]M",   "notes": "Lifts and moves objects or beings." },
+    { "id": "barrier",          "name": "Barrier",          "category": "manipulation","type": "physical", "target": "4",             "drainCode": "[(F/2)+2]S",  "notes": "Creates physical or mana barrier. Barrier Rating = Force." },
+    { "id": "control_actions",  "name": "Control Actions",  "category": "manipulation","type": "mana",     "target": "Willpower (R)", "drainCode": "[(F/2)+2]D",  "notes": "Caster controls target's physical actions." },
+    { "id": "control_thoughts", "name": "Control Thoughts", "category": "manipulation","type": "mana",     "target": "Willpower (R)", "drainCode": "[(F/2)+3]D",  "notes": "Caster controls target's thoughts and actions." },
+    { "id": "poltergeist",      "name": "Poltergeist",      "category": "manipulation","type": "physical", "target": "4",             "drainCode": "[(F/2)+1]M",  "notes": "Area-effect. Flings small objects around randomly." }
+  ]
+}
