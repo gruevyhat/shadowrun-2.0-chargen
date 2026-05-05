@@ -17,7 +17,7 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 - Python tooling skeleton (`scripts/pyproject.toml`, `extract_pdf.py`)
 - `.gitignore`, `CLAUDE.md`, this plan
 
-### Phase 1 — Data extraction (current)
+### Phase 1 — Data extraction (DONE)
 **Goal:** produce validated SR2 JSON files in `data/sr2/`.
 
 1. **System deps**: install `tesseract`, `poppler` via Homebrew. Set up Python `.venv` in `scripts/` and install deps from `pyproject.toml`.
@@ -29,7 +29,7 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 
 **Exit criteria:** all seven JSON files exist, validate against schemas, and round-trip through a smoke-test loader in the app.
 
-### Phase 2 — Generator engine
+### Phase 2 — Generator engine (DONE)
 **Goal:** pure-TypeScript engine in `app/src/engine/` that turns a `CharacterIntent` into a validated `Character`.
 
 1. **Types**: `CharacterIntent`, `Character`, `Metatype`, `Skill`, `Spell`, `GearItem`, `Priority` (A–E), etc. Mirror the JSON Schemas.
@@ -47,7 +47,7 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 
 **Exit criteria:** 100% of generated characters validate; archetype builds visibly differ in attribute/skill/gear distributions.
 
-### Phase 3 — Quiz → Intent mapping
+### Phase 3 — Quiz → Intent mapping (DONE)
 **Goal:** convert quiz answers into a `CharacterIntent`.
 
 1. **Question authoring**: 30 in-fiction forced-choice items, 5 per axis. Each answer shifts one axis by ±1.
@@ -56,16 +56,17 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 
 **Exit criteria:** answer profiles produce thematically appropriate archetypes ≥ ~80% of the time without locking the user out of variety.
 
-### Phase 4 — UI
+### Phase 4 — UI (DONE)
 **Goal:** wire the engine and quiz to the web app.
 
-1. **State**: single Zustand (or React context) store holding `Character`, `seed`, history of section seeds for re-rolls.
-2. **Routes/screens**: Landing → (Quiz | Random) → Character Sheet → (re-roll buttons per section) → Export.
+1. **State**: React context store holding `Character`, current screen, quiz answers.
+2. **Routes/screens**: Landing → (Quiz | Random | Load by code) → Character Sheet → (re-roll buttons per section).
 3. **Character sheet**: themed display (chrome / neon / monospace runner-sheet aesthetic). Read-only; section re-roll buttons in-place.
-4. **Quiz UI**: progress indicator, question card, forced-choice buttons, results screen showing the generated character.
+4. **Quiz UI**: progress indicator, question card, forced-choice buttons, axis profile chart (12-sided dodecagon, color-coded diameter axes) on results screen.
 5. **Loading**: data JSON bundled at build time via Vite imports — no runtime fetch.
+6. **Identity layer**: cultural name/demographics/contacts/background generators feeding the sheet; character code (archetype:magic[:axis]:seed) round-trips through Load.
 
-**Exit criteria:** end-to-end flow works in the browser; both entry points produce a sheet; every section is independently re-rollable.
+**Exit criteria met:** end-to-end flow works in the browser; both entry points produce a sheet; every section is independently re-rollable; partial rerolls preserve master-seed-derived identity (name, demographics, contacts) via per-section `seedOverrides`.
 
 ### Phase 5 — PDF export
 **Goal:** themed printable character sheet.
@@ -81,21 +82,24 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 2. `vite.config.ts` `base` set to the repo path.
 3. Smoke-test the deployed bundle.
 
-## Backlog (discovered during Phase 2)
-- **Physical adept powers**: Adepts have Magic attribute modeled but powers (Improved Reflexes, Killing Hands, etc.) are not purchased from resources yet — adept resource spend is identical to mundane archetypes. Defer to a post-v1 enhancement or Phase 4 tuning pass.
-- **Combat mage vs mage differentiation**: Both currently produce nearly identical characters (same priority layout, same spell selection). The archetypes.json `coreSkills` and spell-picking logic need separate handling for combat mage (combat-focused spells, higher Body/Willpower weights). Defer to archetype tuning pass.
+## Backlog
+- **Physical adept powers**: Adepts have Magic attribute modeled but powers (Improved Reflexes, Killing Hands, etc.) are not purchased from resources — adept resource spend currently mirrors mundane archetypes.
+- **Combat mage vs mage differentiation**: Both produce similar characters; `archetypes.json` `coreSkills` and spell-picking logic need separate handling for combat mage (combat-focused spells, higher Body/Willpower weights).
 - **Archetype tuning**: Priority bias and attribute weight values in `archetypes.json` were set by intuition; a tuning pass against canonical SR2 archetype stats would improve fidelity.
+- **Reroll-resources budget allocation**: weighted-random per-category picks can exhaust nuyen on early categories before the loop reaches later ones; consider reserving budget per category up front.
+- **Concentration validation coverage**: only firearms/melee categories are checked against owned weapons; thrown weapons, projectile weapons, and gunnery aren't yet validated.
 
 ## Status
 
-**Phase 2 complete** (2026-05-03). All engine stages implemented and tested. 9000 generated characters (1000 per archetype) all pass `validate()`. Determinism, re-roll isolation, archetype distributions, and magic/cyberware constraints all verified.
+**Phase 4 complete** (2026-05-04). End-to-end flow works in the browser; both entry points (quiz + random) produce a sheet; every section is independently rerollable with correct seed isolation. Repo published at github.com/gruevyhat/shadowrun-2.0-chargen.
 
-**Key decisions made in Phase 2:**
-- `pickMetatype` decoupled from priorities — uses archetype `preferredMetatypes` probability weights directly; `assignPriorities` enforces race=A constraint after the fact
-- `assignPriorities` assigns most-constrained category first to avoid level collisions (e.g. human adept needing magic=B)
-- Full magicians only get spells; adepts get cyberware/gear path (adept powers not yet modeled)
+**Key decisions made in Phase 4:**
+- `seedOverrides` on `CharacterIntent`: partial rerolls only override their own section's sub-seed, leaving master-seed-derived identity (name, demographics, contacts, deck programs) stable. `'all' / 'priorities' / 'metatype' / 'attributes'` rerolls trigger full regen (priority assignment determines the attribute pool).
+- Concentration/specialization assignment validated against owned weapons via post-process pass after `spendResources`.
+- Resource picks randomized: armor from affordable street pool, cyberware from tiered core + extras, tagged gear weighted-random per category.
+- Axis profile chart: 12-sided dodecagon grid, 6 color-coded diameter axes, one dot per axis at signed position (no connecting polygon).
 
-**Next:** Phase 3 — Quiz → Intent mapping.
+**Next:** Phase 6 (deploy to GitHub Pages) recommended before Phase 5 (PDF export) — deploy is small and gets the app to a real URL where PDF work is easier to evaluate.
 
 ## Risks & mitigations
 - **OCR quality on a 71MB scanned PDF**: mitigated by 400dpi, `--psm 1`, and per-section manual review. Tables (priority, gear, spells) are highest risk; budget hand-transcription time for those.
@@ -104,6 +108,7 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 - **Bundle size**: all rules data is in-app. Mitigation: minify JSON, lazy-load the gear catalog if needed.
 
 ## Open questions (carried forward)
-- How granular should re-rolls be? Section-level (attributes / skills / magic / gear) or finer (single skill, single gear item)? Default: section-level for v1.
-- Quiz tone: gritty in-fiction prose vs. neutral framing? Default: gritty.
-- Default metatype distribution if quiz is ambiguous on the Human ↔ Metahuman axis: weight by SR2's published demographics or uniformly? Default: published demographics.
+- ~~How granular should re-rolls be?~~ Resolved: section-level (skills, resources) plus full regen (priorities/attributes/all).
+- ~~Quiz tone~~: gritty in-fiction prose, locked in.
+- ~~Default metatype distribution~~: archetype `preferredMetatypes` weights drive selection.
+- PDF page count: single-page if achievable, two-page fallback. Decide once template is roughed in.
