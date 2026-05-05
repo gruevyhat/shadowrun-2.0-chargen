@@ -10,50 +10,75 @@ const METATYPE_FLAVOR: Record<MetatypeId, string[]> = {
 };
 
 const ARCHETYPE_BACKGROUNDS: Record<ArchetypeId, string[]> = {
-  street_samurai: [
-    'Chrome and reflexes — that is the whole résumé. {flavor} and fast enough to matter, {name} takes the work nobody else will.',
-    '{name} runs muscle for whoever has the nuyen. {flavor_cap}. No questions, no mess, guaranteed results — or your money back, minus bullets.',
-    'Former military, probably corp, definitely burned. {name} is {flavor} now, and the street has its own kind of discipline.',
+  bodyguard: [
+    'Personal protection is {name}\'s whole résumé. {flavor_cap} — quick enough to matter, professional enough to stay hired.',
+    '{name} stands between clients and whatever they are afraid of. {flavor_cap}. Reputation is the only currency that counts in this work.',
+    'Former security, probably corp. {name} is {flavor} now, freelance and very selective about who gets the benefit of their reflexes.',
   ],
-  mage: [
-    '{name} walks both worlds — mana and concrete. {flavor_cap}, trained in hermetics, educated by the sprawl. The formulas work either way.',
-    'The Awakening gave {name} an edge most runners never get. {flavor_cap} now, casting spells between corporate towers and alley debts.',
-    'Magic is a tool. {name} treats it like one — precise, cold, effective. {flavor_cap} with enough talent to make the megacorps nervous.',
-  ],
-  shaman: [
-    'The spirits talk to {name} — and unlike most people in the sprawl, {name} actually listens. {flavor_cap}, following paths older than the concrete.',
-    '{name} carries something the megacorps can not buy or patent. {flavor_cap}, Awakened with a bond to powers the hermetics never understood.',
-    'Where the mage calculates, {name} negotiates — with spirits, with nature, with forces that predate the UCAS. {flavor_cap} and wiser for it.',
-  ],
-  physical_adept: [
-    'No chrome, no wires — just will channelled into flesh. {name} is {flavor}, and every reflex is earned, not installed.',
-    'The Awakening made {name} a weapon. Not a mage, not a samurai — something rarer. {flavor_cap}, and faster than your threat assessment.',
-    '{name} meditated in rooms people sleep rough in and trained in gyms that double as clinics. {flavor_cap}. The result speaks for itself.',
+  combat_mage: [
+    'Magic and violence — {name} sees no contradiction. {flavor_cap}, trained by institutions that wanted a weapon and got something smarter.',
+    '{name} hits harder than any samurai and farther than any sniper. {flavor_cap}. The mana flows like ammunition, and it never runs dry.',
+    'Military hermetics: an experiment in making Awakened talent lethal. {name} is {flavor}, and the experiment succeeded.',
   ],
   decker: [
     'The Matrix is {name}\'s street. Meat-side is just the commute. {flavor_cap} with a deck and the conviction that every lock has a key.',
     '{name} burns through ICE for breakfast and corporate secrets for dinner. {flavor_cap} — code runs in the blood as surely as anything biological.',
     'They say {name} can crack a host before the sysop finishes their soykaf. {flavor_cap}, self-taught in systems the corps would rather keep locked.',
   ],
+  detective: [
+    'Everyone in the sprawl is hiding something. {name} finds it. {flavor_cap} — and the truth is usually worse than the lie.',
+    '{name} follows threads through the sprawl\'s worst tangles. {flavor_cap}, reading people like datachips and environments like crime scenes.',
+    'The megacorps employ analysts. The syndicates employ fixers. {name} is the one the rest call when it gets complicated. {flavor_cap}.',
+  ],
+  former_company_man: [
+    '{name} did good work for the corp. Now the corp is in the rearview mirror, and the skills travel. {flavor_cap} — useful and not asking questions.',
+    'Burned by the company, walking with its tools. {name} is {flavor} and building a new life from the wreckage of the last contract.',
+    'The corp saw an asset. The street sees a professional. {flavor_cap}. {name} has stopped correcting people on the difference.',
+  ],
+  former_wage_mage: [
+    '{name} left the corporate lab with the formulas intact and the illusions gone. {flavor_cap}, casting for hire now — better clients, fewer NDAs.',
+    'Magic used in a corp\'s service is magic bent out of shape. {name} is {flavor}, trying to use it for something that matters.',
+    'The hermetic tradition survives without the corporate salary. {flavor_cap}. {name} is proof — and casts accordingly.',
+  ],
+  gang_member: [
+    '{name} grew up on the street and learned its rules early. {flavor_cap} — old enough to run, young enough to still have something to prove.',
+    'The gang is family. The turf is home. {name} is {flavor}, defending both with everything available.',
+    'Corporate security calls them a threat. The people on the block call them protection. {flavor_cap}. {name} knows which opinion matters.',
+  ],
+  mercenary: [
+    'Three tours, a clean record, and a credstick number for inquiries. {name} is {flavor} — professional, portable, priced accordingly.',
+    '{name} works for the corp, the polyclubs, or the revolution, as long as the contract is honoured. {flavor_cap}. The work is the work.',
+    'Combat experience across a dozen hot spots, none of them officially acknowledged. {flavor_cap}. {name} has the scars and the invoices to prove it.',
+  ],
   rigger: [
     'If it has an engine, {name} has driven it, crashed it, and rebuilt it better. {flavor_cap} with a control rig and nothing to lose.',
     '{name} sees through sensors and thinks in throttle curves. {flavor_cap} — half pilot, half machine, all professional.',
     'Rigging is not a skill for {name}, it is an identity. {flavor_cap}, jacked in and running hotter than the engines.',
   ],
-  face: [
-    '{name} sells people things they did not know they needed and walks away with what they came for. {flavor_cap} — charm is infrastructure.',
-    'In a world of guns and code, {name} brings something more dangerous: words. {flavor_cap}, and every room is already half-won on arrival.',
-    'The corps negotiate. The gangs threaten. {name} does both better than either. {flavor_cap} — the sharpest weapon is the right sentence.',
+  shaman: [
+    'The spirits talk to {name} — and unlike most people in the sprawl, {name} actually listens. {flavor_cap}, following paths older than the concrete.',
+    '{name} carries something the megacorps cannot buy or patent. {flavor_cap}, Awakened with a bond to powers the hermetics never understood.',
+    'Where the mage calculates, {name} negotiates — with spirits, with nature, with forces that predate the UCAS. {flavor_cap} and wiser for it.',
   ],
-  combat_mage: [
-    'Magic and violence — {name} sees no contradiction. {flavor_cap}, trained by institutions that wanted a weapon and got something smarter.',
-    '{name} hits harder than any street samurai and farther than any sniper. {flavor_cap}. The mana flows like ammunition, and it never runs dry.',
-    'Military hermetics: an experiment in making Awakened talent lethal. {name} is {flavor}, and the experiment succeeded.',
+  street_mage: [
+    'The streets are where the life is, and life is the stuff of magic. {name} is {flavor}, and the formulas work just fine outside the academy.',
+    'Walked away from the corporate lab before it could finish the job. {flavor_cap}, self-taught in the half that actually matters.',
+    'Magic without a corporate salary is still magic. {flavor_cap}. {name} has been proving that since before it was fashionable.',
   ],
-  investigator: [
-    'Everyone in the sprawl is hiding something. {name} finds it. {flavor_cap} — and the truth is usually worse than the lie.',
-    '{name} follows threads through the sprawl\'s worst tangles. {flavor_cap}, reading people like datachips and environments like crime scenes.',
-    'The megacorps employ analysts. The syndicates employ fixers. {name} is the one the rest of them call when it gets complicated. {flavor_cap}.',
+  street_samurai: [
+    'Chrome and reflexes — that is the whole résumé. {flavor} and fast enough to matter, {name} takes the work nobody else will.',
+    '{name} runs muscle for whoever has the nuyen. {flavor_cap}. No questions, no mess, guaranteed results.',
+    'Former military, probably corp, definitely burned. {name} is {flavor} now, and the street has its own kind of discipline.',
+  ],
+  street_shaman: [
+    'The city has spirits too — {name} found them, and they answered. {flavor_cap}, walking the urban paths others cannot see.',
+    '{name} follows the spirits of the sprawl through alleyways the maps do not include. {flavor_cap} and still finding new ones.',
+    'The old shamans went to the wilderness. {name} went deeper into the city. {flavor_cap}, and the city spirits are paying attention.',
+  ],
+  tribesman: [
+    '{name} walks paths between the old ways and the new world. {flavor_cap} — a hunter in urban shadows as easily as wilderness.',
+    'The tribe taught {name} to read land, sky, and people. {flavor_cap}, carrying those skills wherever the shadows lead.',
+    'Corporate security is not built for someone who learned to move like {name} did. {flavor_cap}. The streets are just different terrain.',
   ],
 };
 

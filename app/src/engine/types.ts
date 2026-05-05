@@ -5,8 +5,10 @@ export type MagicDisposition = 'full_magic' | 'adept' | 'mundane';
 export type PriorityLevel    = 'A' | 'B' | 'C' | 'D' | 'E';
 
 export type ArchetypeId =
-  | 'street_samurai' | 'mage' | 'shaman' | 'physical_adept'
-  | 'decker' | 'rigger' | 'face' | 'combat_mage' | 'investigator';
+  | 'bodyguard' | 'combat_mage' | 'decker' | 'detective'
+  | 'former_company_man' | 'former_wage_mage' | 'gang_member' | 'mercenary'
+  | 'rigger' | 'shaman' | 'street_mage' | 'street_samurai'
+  | 'street_shaman' | 'tribesman';
 
 export type MetatypeId = 'human' | 'elf' | 'dwarf' | 'ork' | 'troll';
 

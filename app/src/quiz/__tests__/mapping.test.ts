@@ -66,74 +66,41 @@ describe('axisScoresToIntent — canonical archetype profiles', () => {
     expect(intent.magicDisposition).toBe('mundane');
   });
 
-  it('cerebral + awakened + empath → mage', () => {
+  it('cerebral + iron + awakened → combat_mage', () => {
     const intent = intentFor({
       streetwise_cerebral: 1,
+      iron_empath: -1,
       awakened_mundane: -1,
-      iron_empath: 1,
     });
-    expect(intent.archetype).toBe('mage');
+    expect(intent.archetype).toBe('combat_mage');
     expect(intent.magicDisposition).toBe('full_magic');
   });
 
-  it('wild + awakened + empath → shaman', () => {
+  it('wild + awakened + empath + meta → shaman', () => {
     const intent = intentFor({
       wired_wild: 1,
       awakened_mundane: -1,
       iron_empath: 1,
+      human_metahuman: 1,
     });
     expect(intent.archetype).toBe('shaman');
     expect(intent.magicDisposition).toBe('full_magic');
   });
 
-  it('wired + iron + awakened → physical_adept', () => {
+  it('wired + cerebral + mundane + operator + meta → decker', () => {
     const intent = intentFor({
       wired_wild: -1,
-      iron_empath: -1,
-      awakened_mundane: -1,
-      streetwise_cerebral: -1,
-    });
-    expect(intent.archetype).toBe('physical_adept');
-    expect(intent.magicDisposition).toBe('adept');
-  });
-
-  it('cerebral + mundane + empath + operator → decker', () => {
-    const intent = intentFor({
       streetwise_cerebral: 1,
+      iron_empath: 1,   // empath (vs rigger's iron) separates decker
       awakened_mundane: 1,
-      iron_empath: 1,
       runner_operator: 1,
-      wired_wild: -1,
+      human_metahuman: 1,
     });
     expect(intent.archetype).toBe('decker');
     expect(intent.magicDisposition).toBe('mundane');
   });
 
-  it('wild + empath + mundane + streetwise → face', () => {
-    const intent = intentFor({
-      wired_wild: 1,
-      iron_empath: 1,
-      awakened_mundane: 1,
-      streetwise_cerebral: -1,
-      runner_operator: 1,
-    });
-    expect(intent.archetype).toBe('face');
-    expect(intent.magicDisposition).toBe('mundane');
-  });
-
-  it('wired + streetwise + empath + operator + mundane → investigator', () => {
-    const intent = intentFor({
-      wired_wild: -1,
-      streetwise_cerebral: -1,
-      iron_empath: 1,
-      runner_operator: 1,
-      awakened_mundane: 1,
-    });
-    expect(intent.archetype).toBe('investigator');
-    expect(intent.magicDisposition).toBe('mundane');
-  });
-
-  it('wired + cerebral + iron + operator + mundane → rigger', () => {
+  it('wired + cerebral + operator + mundane → rigger', () => {
     const intent = intentFor({
       wired_wild: -1,
       streetwise_cerebral: 1,
@@ -145,13 +112,27 @@ describe('axisScoresToIntent — canonical archetype profiles', () => {
     expect(intent.magicDisposition).toBe('mundane');
   });
 
-  it('cerebral + iron + awakened → combat_mage', () => {
+  it('cerebral + empath + operator + awakened → former_wage_mage', () => {
     const intent = intentFor({
       streetwise_cerebral: 1,
-      iron_empath: -1,
+      iron_empath: 1,
+      runner_operator: 1,
       awakened_mundane: -1,
+      wired_wild: 1,
     });
-    expect(intent.archetype).toBe('combat_mage');
+    expect(intent.archetype).toBe('former_wage_mage');
+    expect(intent.magicDisposition).toBe('full_magic');
+  });
+
+  it('wild + awakened + empath + street → street_shaman', () => {
+    const intent = intentFor({
+      wired_wild: 1,
+      awakened_mundane: -1,
+      iron_empath: 1,
+      runner_operator: -1,
+      human_metahuman: -1,
+    });
+    expect(intent.archetype).toBe('street_shaman');
     expect(intent.magicDisposition).toBe('full_magic');
   });
 
@@ -162,13 +143,13 @@ describe('axisScoresToIntent — canonical archetype profiles', () => {
 });
 
 describe('axisScoresToIntent — metatype hints', () => {
-  it('strong metahuman lean on face gives elf hint', () => {
+  it('strong metahuman lean on decker gives elf hint', () => {
     const scores: AxisScores = {
-      wired_wild: 4, streetwise_cerebral: -1, iron_empath: 4,
-      runner_operator: 2, awakened_mundane: 4, human_metahuman: 4,
+      wired_wild: -4, streetwise_cerebral: 5, iron_empath: 1,
+      runner_operator: 3, awakened_mundane: 4, human_metahuman: 4,
     };
     const intent = axisScoresToIntent(scores, 1);
-    expect(intent.archetype).toBe('face');
+    expect(intent.archetype).toBe('decker');
     expect(intent.metatypeHint).toBe('elf');
   });
 

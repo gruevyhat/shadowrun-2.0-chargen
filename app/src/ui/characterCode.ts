@@ -5,9 +5,20 @@ import { AXIS_ORDER } from '../quiz/mapping';
 // ── Short-code tables ─────────────────────────────────────────────────────
 
 const ARCHETYPE_TO_CODE: Record<ArchetypeId, string> = {
-  street_samurai: 'ss', mage: 'm',  shaman: 'sh', physical_adept: 'pa',
-  decker:         'd',  rigger: 'r', face:   'f',  combat_mage:   'cm',
-  investigator:   'inv',
+  bodyguard:          'bg',
+  combat_mage:        'cm',
+  decker:             'd',
+  detective:          'det',
+  former_company_man: 'fcm',
+  former_wage_mage:   'fwm',
+  gang_member:        'gm',
+  mercenary:          'merc',
+  rigger:             'r',
+  shaman:             'sh',
+  street_mage:        'sm',
+  street_samurai:     'ss',
+  street_shaman:      'ssh',
+  tribesman:          'tri',
 };
 
 const CODE_TO_ARCHETYPE: Record<string, ArchetypeId> = Object.fromEntries(
@@ -67,8 +78,10 @@ export function serializeCode(c: CharacterCode): string {
 // ── Parse ─────────────────────────────────────────────────────────────────
 
 const LONG_ARCHETYPES = new Set<string>([
-  'street_samurai', 'mage', 'shaman', 'physical_adept',
-  'decker', 'rigger', 'face', 'combat_mage', 'investigator',
+  'bodyguard', 'combat_mage', 'decker', 'detective',
+  'former_company_man', 'former_wage_mage', 'gang_member', 'mercenary',
+  'rigger', 'shaman', 'street_mage', 'street_samurai',
+  'street_shaman', 'tribesman',
 ]);
 const LONG_MAGIC = new Set<string>(['mundane', 'full_magic', 'adept']);
 

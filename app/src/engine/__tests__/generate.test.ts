@@ -4,20 +4,27 @@ import { validate } from '../validate';
 import type { ArchetypeId, CharacterIntent, MagicDisposition } from '../types';
 
 const ARCHETYPES: ArchetypeId[] = [
-  'street_samurai', 'mage', 'shaman', 'physical_adept',
-  'decker', 'rigger', 'face', 'combat_mage', 'investigator',
+  'bodyguard', 'combat_mage', 'decker', 'detective',
+  'former_company_man', 'former_wage_mage', 'gang_member', 'mercenary',
+  'rigger', 'shaman', 'street_mage', 'street_samurai',
+  'street_shaman', 'tribesman',
 ];
 
 const MAGIC_BY_ARCHETYPE: Record<ArchetypeId, MagicDisposition> = {
-  street_samurai: 'mundane',
-  mage:           'full_magic',
-  shaman:         'full_magic',
-  physical_adept: 'adept',
-  decker:         'mundane',
-  rigger:         'mundane',
-  face:           'mundane',
-  combat_mage:    'full_magic',
-  investigator:   'mundane',
+  bodyguard:          'mundane',
+  combat_mage:        'full_magic',
+  decker:             'mundane',
+  detective:          'mundane',
+  former_company_man: 'mundane',
+  former_wage_mage:   'full_magic',
+  gang_member:        'mundane',
+  mercenary:          'mundane',
+  rigger:             'mundane',
+  shaman:             'full_magic',
+  street_mage:        'full_magic',
+  street_samurai:     'mundane',
+  street_shaman:      'full_magic',
+  tribesman:          'mundane',
 };
 
 function makeIntent(archetype: ArchetypeId, seed: number): CharacterIntent {
@@ -68,16 +75,16 @@ describe('generate — archetype distributions differ meaningfully', () => {
     return sum / n;
   }
 
-  it('street_samurai mean body > mage mean body', () => {
-    expect(avgAttr('street_samurai', 'body' as never)).toBeGreaterThan(avgAttr('mage', 'body' as never));
+  it('street_samurai mean body > street_mage mean body', () => {
+    expect(avgAttr('street_samurai', 'body' as never)).toBeGreaterThan(avgAttr('street_mage', 'body' as never));
   });
 
-  it('mage mean intelligence > street_samurai mean intelligence', () => {
-    expect(avgAttr('mage', 'intelligence' as never)).toBeGreaterThan(avgAttr('street_samurai', 'intelligence' as never));
+  it('street_mage mean intelligence > street_samurai mean intelligence', () => {
+    expect(avgAttr('street_mage', 'intelligence' as never)).toBeGreaterThan(avgAttr('street_samurai', 'intelligence' as never));
   });
 
-  it('face mean charisma > rigger mean charisma', () => {
-    expect(avgAttr('face', 'charisma' as never)).toBeGreaterThan(avgAttr('rigger', 'charisma' as never));
+  it('gang_member mean charisma > rigger mean charisma', () => {
+    expect(avgAttr('gang_member', 'charisma' as never)).toBeGreaterThan(avgAttr('rigger', 'charisma' as never));
   });
 });
 
@@ -101,15 +108,14 @@ describe('reroll — isolation', () => {
   });
 
   it('reroll all produces a different character with different seed', () => {
-    const intent = makeIntent('mage', 1);
+    const intent = makeIntent('street_mage', 1);
     const original = generate(intent);
     const rerolled = reroll(original, 'all', 2);
-    // Different seed → should differ (overwhelmingly likely)
     expect(rerolled.intent.seed).toBe(2);
   });
 
   it('reroll all with same seed reproduces original', () => {
-    const intent = makeIntent('mage', 1);
+    const intent = makeIntent('street_mage', 1);
     const original = generate(intent);
     const rerolled = reroll(original, 'all', 1);
     expect(rerolled.attributes).toEqual(original.attributes);
@@ -118,9 +124,9 @@ describe('reroll — isolation', () => {
 });
 
 describe('generate — magic characters have spells', () => {
-  it('mage always has spells', () => {
+  it('street_mage always has spells', () => {
     for (let seed = 1; seed <= 50; seed++) {
-      const char = generate(makeIntent('mage', seed));
+      const char = generate(makeIntent('street_mage', seed));
       expect(char.loadout.spells.length).toBeGreaterThan(0);
     }
   });

@@ -49,15 +49,20 @@ const BASE_APPEARANCE: Record<MetatypeId, { M: string[]; F: string[] }> = {
 };
 
 const ARCHETYPE_STYLE: Record<ArchetypeId, string[]> = {
-  street_samurai: ['chrome visible at the wrists, scars arranged like a biography',       'military posture, gear worn like a second skin'],
-  mage:           ['formal but frayed, hermetic seals stitched into the lapels',            'carries a focus like other people carry weapons'],
-  shaman:         ['bone fetishes and hand-stitched leathers, paint on the cheekbones',    'spirit-touched calm, eyes focused somewhere else'],
-  physical_adept: ['no visible chrome, no wasted movement',                                'moves like water finding cracks in concrete'],
-  decker:         ['datajack glinting behind the ear, deck slung low on the hip',          'hoodie and fingerless gloves, eyes always scanning'],
-  rigger:         ['grease-stained and wired, tools on the belt',                          'goggle marks around the eyes, smells faintly of engine'],
-  face:           ['immaculate under the neon, tailored even in a squat',                  'dressed like a weapon, every crease deliberate'],
-  combat_mage:    ['military frame, runic tattoos on the forearms',                        'controlled aggression in every movement, mana-focus at the hip'],
-  investigator:   ['coat that has seen better decades, pockets perpetually full',          'watching everything, remembering more'],
+  bodyguard:          ['professional stance, eyes always working the room',                  'gear worn functionally — nothing decorative, nothing loose'],
+  combat_mage:        ['military frame, runic tattoos on the forearms',                      'controlled aggression in every movement, mana-focus at the hip'],
+  decker:             ['datajack glinting behind the ear, deck slung low on the hip',        'hoodie and fingerless gloves, eyes always scanning'],
+  detective:          ['coat that has seen better decades, pockets perpetually full',        'watching everything, remembering more'],
+  former_company_man: ['corp-issue posture they\'ve never fully shed',                       'quality gear worn carefully — someone who knows what things cost'],
+  former_wage_mage:   ['formal but frayed, hermetic seals stitched into the lapels',         'carries a focus like other people carry weapons'],
+  gang_member:        ['gang colours, street ink, posture that owns the block',              'lean and fast-looking, everything about them says local'],
+  mercenary:          ['military bearing worn loose, gear chosen for function over flash',   'eyes that read terrain before people — a professional habit'],
+  rigger:             ['grease-stained and wired, tools on the belt',                        'goggle marks around the eyes, smells faintly of engine'],
+  shaman:             ['bone fetishes and hand-stitched leathers, paint on the cheekbones', 'spirit-touched calm, eyes focused somewhere else'],
+  street_mage:        ['street clothes layered over ritual kit',                             'focus hidden in plain sight, mana-sight gives the eyes a distant quality'],
+  street_samurai:     ['chrome visible at the wrists, scars arranged like a biography',     'military posture, gear worn like a second skin'],
+  street_shaman:      ['urban fetishes worked into jacket and belt, city-worn',              'calm amid noise, reads the block like a spirit map'],
+  tribesman:          ['natural materials, practical and precise',                           'stillness that reads as patience — or threat, depending on context'],
 };
 
 export function generateDemographics(seed: number, metatype: MetatypeId, archetype?: ArchetypeId): Demographics {

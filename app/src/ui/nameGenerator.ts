@@ -31,9 +31,20 @@ const HANDLES: Record<'combat' | 'magic' | 'tech' | 'social', { M: string[]; F: 
 };
 
 const ARCHETYPE_THEME: Record<ArchetypeId, 'combat' | 'magic' | 'tech' | 'social'> = {
-  street_samurai: 'combat',  mage: 'magic',    shaman:         'magic',
-  physical_adept: 'combat',  decker: 'tech',   rigger:         'tech',
-  face:           'social',  combat_mage: 'magic', investigator: 'social',
+  bodyguard:          'combat',
+  combat_mage:        'magic',
+  decker:             'tech',
+  detective:          'social',
+  former_company_man: 'combat',
+  former_wage_mage:   'magic',
+  gang_member:        'combat',
+  mercenary:          'combat',
+  rigger:             'tech',
+  shaman:             'magic',
+  street_mage:        'magic',
+  street_samurai:     'combat',
+  street_shaman:      'magic',
+  tribesman:          'combat',
 };
 
 // ── Cultural first names by region ────────────────────────────────────────

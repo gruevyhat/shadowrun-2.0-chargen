@@ -30,15 +30,20 @@ const WEAPON_CATEGORIES = new Set([
 ]);
 
 const ALL_ARCHETYPES: { id: ArchetypeId; magic: MagicDisposition }[] = [
-  { id: 'street_samurai', magic: 'mundane'    },
-  { id: 'mage',           magic: 'full_magic' },
-  { id: 'shaman',         magic: 'full_magic' },
-  { id: 'physical_adept', magic: 'adept'      },
-  { id: 'decker',         magic: 'mundane'    },
-  { id: 'rigger',         magic: 'mundane'    },
-  { id: 'face',           magic: 'mundane'    },
-  { id: 'combat_mage',    magic: 'full_magic' },
-  { id: 'investigator',   magic: 'mundane'    },
+  { id: 'bodyguard',          magic: 'mundane'    },
+  { id: 'combat_mage',        magic: 'full_magic' },
+  { id: 'decker',             magic: 'mundane'    },
+  { id: 'detective',          magic: 'mundane'    },
+  { id: 'former_company_man', magic: 'mundane'    },
+  { id: 'former_wage_mage',   magic: 'full_magic' },
+  { id: 'gang_member',        magic: 'mundane'    },
+  { id: 'mercenary',          magic: 'mundane'    },
+  { id: 'rigger',             magic: 'mundane'    },
+  { id: 'shaman',             magic: 'full_magic' },
+  { id: 'street_mage',        magic: 'full_magic' },
+  { id: 'street_samurai',     magic: 'mundane'    },
+  { id: 'street_shaman',      magic: 'full_magic' },
+  { id: 'tribesman',          magic: 'mundane'    },
 ];
 
 // ── Static tables ─────────────────────────────────────────────────────────

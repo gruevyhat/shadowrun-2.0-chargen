@@ -15,28 +15,38 @@ const SKILL_CONCS: Record<string, string[]> = Object.fromEntries(
 
 // Per archetype: which skills receive a concentration, in priority order
 const ARCHETYPE_CONC_SKILLS: Partial<Record<ArchetypeId, string[]>> = {
-  street_samurai: ['firearms', 'armed_combat', 'athletics'],
-  mage:           ['sorcery', 'conjuring'],
-  shaman:         ['conjuring', 'sorcery'],
-  physical_adept: ['unarmed_combat', 'athletics', 'stealth'],
-  decker:         ['computer', 'electronics'],
-  rigger:         ['car', 'rotor_craft', 'electronics'],
-  face:           ['negotiation', 'etiquette', 'leadership'],
-  combat_mage:    ['sorcery', 'firearms', 'athletics'],
-  investigator:   ['interrogation', 'etiquette', 'stealth'],
+  bodyguard:          ['firearms', 'unarmed_combat', 'car'],
+  combat_mage:        ['sorcery', 'conjuring'],
+  decker:             ['computer', 'electronics'],
+  detective:          ['firearms', 'stealth', 'etiquette'],
+  former_company_man: ['firearms', 'car', 'unarmed_combat'],
+  former_wage_mage:   ['sorcery', 'conjuring', 'magical_theory'],
+  gang_member:        ['armed_combat', 'firearms', 'athletics'],
+  mercenary:          ['firearms', 'gunnery', 'throwing_weapons'],
+  rigger:             ['car', 'rotor_craft', 'electronics'],
+  shaman:             ['conjuring', 'sorcery'],
+  street_mage:        ['sorcery', 'conjuring'],
+  street_samurai:     ['firearms', 'armed_combat', 'athletics'],
+  street_shaman:      ['conjuring', 'sorcery'],
+  tribesman:          ['projectile_weapons', 'stealth', 'armed_combat'],
 };
 
 // Per archetype: which skill also receives a specialization
 const ARCHETYPE_SPEC_SKILL: Partial<Record<ArchetypeId, string>> = {
-  street_samurai: 'firearms',
-  mage:           'sorcery',
-  shaman:         'conjuring',
-  physical_adept: 'unarmed_combat',
-  decker:         'computer',
-  rigger:         'car',
-  face:           'negotiation',
-  combat_mage:    'sorcery',
-  investigator:   'interrogation',
+  bodyguard:          'firearms',
+  combat_mage:        'sorcery',
+  decker:             'computer',
+  detective:          'firearms',
+  former_company_man: 'firearms',
+  former_wage_mage:   'sorcery',
+  gang_member:        'armed_combat',
+  mercenary:          'firearms',
+  rigger:             'car',
+  shaman:             'conjuring',
+  street_mage:        'sorcery',
+  street_samurai:     'firearms',
+  street_shaman:      'conjuring',
+  tribesman:          'projectile_weapons',
 };
 
 // Possible specialization labels per concentration name

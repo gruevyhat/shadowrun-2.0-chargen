@@ -30,7 +30,8 @@ export function spendResources(
 
   // ── Spells (full magicians only — adepts use magic for physical powers, not spells) ──
   if (intent.magicDisposition === 'full_magic') {
-    const magicCategory = intent.archetype === 'shaman' ? 'mana' : null; // shamans prefer mana
+    const SHAMAN_ARCHETYPES = new Set(['shaman', 'street_shaman']);
+    const magicCategory = SHAMAN_ARCHETYPES.has(intent.archetype) ? 'mana' : null; // shamans prefer mana spells
     const combatSpells  = spellsData.spells.filter(s => s.category === 'combat');
     const detectSpells  = spellsData.spells.filter(s => s.category === 'detection');
     const otherSpells   = spellsData.spells.filter(s => !['combat', 'detection'].includes(s.category));
@@ -79,24 +80,37 @@ export function spendResources(
   // Archetype core picks (always considered first) and an extras pool (randomized)
   const cyberCore: Record<string, string[][]> = {
     // Each inner array is a tier of alternatives — one is randomly chosen per tier
-    street_samurai: [
-      ['wired_reflexes_1', 'wired_reflexes_2'],
-      ['smartlink'],
-      ['cybereyes'],
-    ],
-    physical_adept: [['cybereyes']],
-    decker:         [['datajack'], ['chipjack', 'cybereyes']],
-    rigger:         [['vehicle_control_rig_1', 'vehicle_control_rig_2'], ['datajack'], ['cybereyes']],
-    face:           [], combat_mage: [], investigator: [], mage: [], shaman: [],
+    bodyguard:          [['wired_reflexes_1', 'wired_reflexes_2'], ['dermal_plating_1', 'dermal_plating_2'], ['smartlink']],
+    combat_mage:        [['cybereyes']],
+    decker:             [['datajack'], ['chipjack', 'cybereyes']],
+    detective:          [],
+    former_company_man: [['wired_reflexes_1', 'wired_reflexes_2'], ['datajack'], ['smartlink']],
+    former_wage_mage:   [],
+    gang_member:        [['hand_razors'], ['cybereyes']],
+    mercenary:          [['wired_reflexes_1'], ['cybereyes']],
+    rigger:             [['vehicle_control_rig_1', 'vehicle_control_rig_2'], ['datajack'], ['cybereyes']],
+    shaman:             [],
+    street_mage:        [],
+    street_samurai:     [['wired_reflexes_1', 'wired_reflexes_2'], ['smartlink'], ['cybereyes'], ['dermal_plating_1', 'dermal_plating_2']],
+    street_shaman:      [],
+    tribesman:          [],
   };
 
   const cyberExtras: Record<string, string[]> = {
-    street_samurai: ['cyberears', 'low_light_vision', 'thermographic_vision', 'dermal_plating_1', 'dermal_plating_2', 'muscle_replacement_1', 'muscle_replacement_2', 'hand_razors', 'spur'],
-    physical_adept: ['low_light_vision', 'thermographic_vision'],
-    decker:         ['cybereyes', 'cyberears', 'radio_receive', 'low_light_vision'],
-    rigger:         ['cyberears', 'low_light_vision', 'radio_twoway'],
-    face:           ['cybereyes', 'low_light_vision'],
-    combat_mage:    [], investigator: ['cybereyes', 'low_light_vision'], mage: [], shaman: [],
+    bodyguard:          ['radio_receive', 'cyberears', 'low_light_vision', 'thermographic_vision', 'muscle_replacement_1'],
+    combat_mage:        ['low_light_vision', 'thermographic_vision'],
+    decker:             ['cybereyes', 'cyberears', 'radio_receive', 'low_light_vision'],
+    detective:          [],
+    former_company_man: ['cyberears', 'low_light_vision', 'thermographic_vision', 'muscle_replacement_1'],
+    former_wage_mage:   [],
+    gang_member:        ['low_light_vision', 'thermographic_vision'],
+    mercenary:          ['cyberears', 'low_light_vision', 'radio_receive', 'radio_twoway'],
+    rigger:             ['cyberears', 'low_light_vision', 'radio_twoway'],
+    shaman:             [],
+    street_mage:        [],
+    street_samurai:     ['cyberears', 'low_light_vision', 'thermographic_vision', 'muscle_replacement_1', 'muscle_replacement_2', 'hand_razors', 'spur'],
+    street_shaman:      [],
+    tribesman:          [],
   };
 
   const tryBuy = (id: string): boolean => {
@@ -135,7 +149,7 @@ export function spendResources(
 
   // ── Gear ──────────────────────────────────────────────────────────────────
   // Must-have lifestyle (fixed by archetype)
-  const MIDDLE_LIFESTYLE = new Set(['face', 'investigator', 'mage', 'shaman', 'combat_mage']);
+  const MIDDLE_LIFESTYLE = new Set(['bodyguard', 'combat_mage', 'decker', 'rigger', 'street_samurai', 'former_company_man']);
   const lifestyleId = MIDDLE_LIFESTYLE.has(intent.archetype) ? 'lifestyle_middle' : 'lifestyle_low';
   const lifestyle = gearData.gear.find(g => g.id === lifestyleId);
   if (lifestyle && nuyen >= lifestyle.costNuyen) {
@@ -247,15 +261,20 @@ export function spendResources(
 
   // ── Extra contacts (2500¥ each, archetype-capped) ────────────────────────
   const ARCHETYPE_MAX_CONTACTS: Record<string, number> = {
-    face:           4,
-    investigator:   3,
-    decker:         2,
-    mage:           0,
-    shaman:         0,
-    street_samurai: 1,
-    physical_adept: 1,
-    rigger:         1,
-    combat_mage:    0,
+    bodyguard:          1,
+    combat_mage:        0,
+    decker:             1,
+    detective:          4,
+    former_company_man: 1,
+    former_wage_mage:   0,
+    gang_member:        2,
+    mercenary:          1,
+    rigger:             1,
+    shaman:             0,
+    street_mage:        0,
+    street_samurai:     1,
+    street_shaman:      0,
+    tribesman:          1,
   };
   const CONTACT_COST   = 2500;
   const maxContacts    = ARCHETYPE_MAX_CONTACTS[intent.archetype] ?? 1;

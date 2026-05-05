@@ -23,15 +23,20 @@ const LAST_NAMES = [
 
 // All 6 contact roles per archetype; first 2 are the "free" contacts
 const ARCHETYPE_CONTACTS: Record<ArchetypeId, string[]> = {
-  street_samurai: ['Fixer',      'Arms Dealer',      'Street Doc',        'Mercenary',          'Fence',                 'Corporate Insider'],
-  mage:           ['Fixer',      'Talismonger',       'Hermetic Scholar',  'Fellow Mage',        'Awakened Fence',        'Library Archivist'],
-  shaman:         ['Fixer',      'Tribal Elder',      'Healer',            'Nature Guide',       'Street Shaman',         'Spirit Talker'],
-  physical_adept: ['Fixer',      'Sensei',            'Street Doc',        'Street Samurai',     'Adept Circle Contact',  'Dojo Supplier'],
-  decker:         ['Fixer',      'System Operator',   'Tech Fence',        'Corporate Insider',  'Black Market Coder',    'Ghost in the Shell'],
-  rigger:         ['Fixer',      'Chop Shop Owner',   'Parts Dealer',      'Driver Network',     'Drone Supplier',        'Garage Hermit'],
-  face:           ['Fixer',      'Mr. Johnson',       'Club Owner',        'Corporate Liaison',  'Info Broker',           'Socialite Contact'],
-  combat_mage:    ['Fixer',      'Talismonger',       'Military Contact',  'Battle Mage',        'Awakened Armourer',     'Black Site Contact'],
-  investigator:   ['Fixer',      'Info Broker',       'Street Informant',  'Police Contact',     'Corp Whistleblower',    'Underworld Ear'],
+  bodyguard:          ['Fixer',  'Arms Dealer',       'Street Doc',        'Corp Security Chief', 'Fence',              'Loyal Client'],
+  combat_mage:        ['Fixer',  'Talismonger',       'Military Contact',  'Battle Mage',         'Awakened Armourer',  'Black Site Contact'],
+  decker:             ['Fixer',  'System Operator',   'Tech Fence',        'Corporate Insider',   'Black Market Coder', 'Ghost in the Shell'],
+  detective:          ['Fixer',  'Police Contact',    'Info Broker',       'Street Informant',    'Corp Whistleblower', 'Underworld Ear'],
+  former_company_man: ['Fixer',  'Corporate Insider', 'Arms Dealer',       'Street Doc',          'Old Squad Contact',  'Loyal Fixer'],
+  former_wage_mage:   ['Fixer',  'Talismonger',       'Hermetic Scholar',  'Corp Mage Contact',   'Awakened Fence',     'Library Archivist'],
+  gang_member:        ['Fixer',  'Gang Leader',       'Street Doc',        'Fence',               'Rival Gang Contact', 'Turf Informant'],
+  mercenary:          ['Fixer',  'Arms Dealer',       'Military Contact',  'Merc Broker',         'Street Doc',         'Logistics Specialist'],
+  rigger:             ['Fixer',  'Chop Shop Owner',   'Parts Dealer',      'Driver Network',      'Drone Supplier',     'Garage Hermit'],
+  shaman:             ['Fixer',  'Tribal Elder',      'Healer',            'Nature Guide',        'Spirit Talker',      'Wilderness Contact'],
+  street_mage:        ['Fixer',  'Talismonger',       'Street Mage',       'Awakened Community',  'Hermetic Scholar',   'Spirit Talker'],
+  street_samurai:     ['Fixer',  'Arms Dealer',       'Street Doc',        'Mercenary',           'Fence',              'Corporate Insider'],
+  street_shaman:      ['Fixer',  'Urban Shaman',      'Healer',            'City Spirit Guide',   'Talismonger',        'Gang Contact'],
+  tribesman:          ['Fixer',  'Tribal Elder',      'Nature Guide',      'Arms Contact',        'Healer',             'Wilderness Scout'],
 };
 
 export function generateContacts(seed: number, archetype: ArchetypeId, count = 2): Contact[] {
