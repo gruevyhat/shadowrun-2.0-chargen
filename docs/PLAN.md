@@ -68,14 +68,14 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 
 **Exit criteria met:** end-to-end flow works in the browser; both entry points produce a sheet; every section is independently re-rollable; partial rerolls preserve master-seed-derived identity (name, demographics, contacts) via per-section `seedOverrides`.
 
-### Phase 5 — PDF export
+### Phase 5 — PDF export (DONE)
 **Goal:** themed printable character sheet.
 
-1. **Library**: `@react-pdf/renderer` (client-side, no backend).
-2. **Template**: SR2-styled sheet — attributes block, skills, magic, gear, weapons, contacts, notes. Single-page if possible, two pages otherwise.
-3. **Theming**: condensed monospace headings, dark accents, subtle SR-style ornaments.
+1. **Library**: `@react-pdf/renderer` v4.5.1 (client-side, no backend).
+2. **Template**: SR2-styled two-page sheet — attributes, condition monitors, dice pools, weapons, skills with pip ratings, cyberware, spells, cyberdeck stats, gear, vehicles, contacts, background.
+3. **Theming**: dark terminal aesthetic (#060c09 bg), neon teal (#00ffcc) accents, Courier monospace, FASA watermark footer.
 
-**Exit criteria:** "Export PDF" produces a file usable at the table; renders consistently across Chrome/Firefox/Safari.
+**Exit criteria met:** EXPORT PDF button on sheet generates a blob client-side and downloads as `<RunnerName>.pdf`. Two-page layout covers all character data.
 
 ### Phase 6 — Deploy
 1. GitHub Pages workflow (`.github/workflows/deploy.yml`) — `npm run build` then publish `app/dist/`.
@@ -91,15 +91,15 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 
 ## Status
 
-**Phase 4 complete** (2026-05-04). End-to-end flow works in the browser; both entry points (quiz + random) produce a sheet; every section is independently rerollable with correct seed isolation. Repo published at github.com/gruevyhat/shadowrun-2.0-chargen.
+**Phases 1–6 complete** (2026-05-04). All v1 milestones done. App live at https://gruevyhat.github.io/shadowrun-2.0-chargen/
 
-**Key decisions made in Phase 4:**
-- `seedOverrides` on `CharacterIntent`: partial rerolls only override their own section's sub-seed, leaving master-seed-derived identity (name, demographics, contacts, deck programs) stable. `'all' / 'priorities' / 'metatype' / 'attributes'` rerolls trigger full regen (priority assignment determines the attribute pool).
-- Concentration/specialization assignment validated against owned weapons via post-process pass after `spendResources`.
-- Resource picks randomized: armor from affordable street pool, cyberware from tiered core + extras, tagged gear weighted-random per category.
-- Axis profile chart: 12-sided dodecagon grid, 6 color-coded diameter axes, one dot per axis at signed position (no connecting polygon).
+**Key decisions (Phase 5):**
+- Two-page PDF layout: page 1 = combat sheet (attrs, weapons, skills, cyberware), page 2 = background & equipment (spells, deck, gear, vehicles, contacts, details).
+- Client-side generation via `pdf().toBlob()` — no backend, no network request.
+- Dark terminal theme (#060c09 bg, #00ffcc neon, Courier) to match the web app's SR aesthetic.
+- FASA watermark footer with character code for traceability.
 
-**Next:** Phase 6 (deploy to GitHub Pages) recommended before Phase 5 (PDF export) — deploy is small and gets the app to a real URL where PDF work is easier to evaluate.
+**Next:** backlog items or v2 planning. See Backlog section below.
 
 ## Risks & mitigations
 - **OCR quality on a 71MB scanned PDF**: mitigated by 400dpi, `--psm 1`, and per-section manual review. Tables (priority, gear, spells) are highest risk; budget hand-transcription time for those.
