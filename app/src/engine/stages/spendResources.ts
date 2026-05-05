@@ -70,35 +70,10 @@ export function spendResources(
     }
     forcePoints = Math.max(0, fp);
 
-    // Full magicians skip cyberware — buy lifestyle, armor, sidearm and return
-    const lifestyle = gearData.gear.find(g => g.id === 'lifestyle_middle');
-    if (lifestyle && nuyen >= lifestyle.costNuyen) {
-      gear.push({ gearId: lifestyle.id, costNuyen: lifestyle.costNuyen, quantity: 1 });
-      nuyen -= lifestyle.costNuyen;
-    }
-    const armor = gearData.gear.find(g => g.id === 'armor_clothing');
-    if (armor && nuyen >= armor.costNuyen) {
-      gear.push({ gearId: armor.id, costNuyen: armor.costNuyen, quantity: 1 });
-      nuyen -= armor.costNuyen;
-    }
-    const pistol = gearData.gear.find(g => g.id === 'ruger_super_warhawk');
-    if (pistol && nuyen >= pistol.costNuyen) {
-      gear.push({ gearId: pistol.id, costNuyen: pistol.costNuyen, quantity: 1 });
-      nuyen -= pistol.costNuyen;
-    }
-    // Extra contacts for full magicians (combat_mage/mage/shaman get 0 purchased contacts)
-    const MAGE_MAX_CONTACTS: Record<string, number> = { mage: 0, shaman: 0, combat_mage: 0 };
-    const mageContactMax  = MAGE_MAX_CONTACTS[intent.archetype] ?? 0;
-    const MAGE_CONTACT_COST = 2500;
-    let mageContacts = 0;
-    while (nuyen >= MAGE_CONTACT_COST && mageContacts < mageContactMax) {
-      nuyen -= MAGE_CONTACT_COST;
-      mageContacts++;
-    }
-    return { cyberware, gear, spells, remainingNuyen: nuyen, remainingForcePoints: forcePoints, purchasedContactCount: mageContacts };
+    // Fall through to shared gear path — cyberCore/cyberExtras are empty for mage archetypes
   }
 
-  // ── Cyberware (mundane / adept archetypes) ────────────────────────────────
+  // ── Cyberware (mundane / adept / full-magic archetypes) ───────────────────
   const cyberPool = cyberwareData.cyberware;
 
   // Archetype core picks (always considered first) and an extras pool (randomized)
@@ -160,8 +135,8 @@ export function spendResources(
 
   // ── Gear ──────────────────────────────────────────────────────────────────
   // Must-have lifestyle (fixed by archetype)
-  const lifestyleId = (intent.archetype === 'face' || intent.archetype === 'investigator')
-    ? 'lifestyle_middle' : 'lifestyle_low';
+  const MIDDLE_LIFESTYLE = new Set(['face', 'investigator', 'mage', 'shaman', 'combat_mage']);
+  const lifestyleId = MIDDLE_LIFESTYLE.has(intent.archetype) ? 'lifestyle_middle' : 'lifestyle_low';
   const lifestyle = gearData.gear.find(g => g.id === lifestyleId);
   if (lifestyle && nuyen >= lifestyle.costNuyen) {
     gear.push({ gearId: lifestyle.id, costNuyen: lifestyle.costNuyen, quantity: 1 });
@@ -245,6 +220,28 @@ export function spendResources(
         gear.push({ gearId: item.id, costNuyen: item.costNuyen, quantity: 1 });
         nuyen -= item.costNuyen;
       }
+    }
+  }
+
+  // ── Guaranteed weapon ────────────────────────────────────────────────────
+  // Every character must carry at least one weapon. Deckers/riggers have no
+  // weapon gearTags, and adepts can run out of budget before meleeWeapon is
+  // reached, so we enforce it here after all other spending.
+  const WEAPON_CATS_SET = new Set(['pistol','smg','rifle','lmg','shotgun','meleeWeapon','projectileWeapon','explosive']);
+  const hasWeapon = gear.some(g => {
+    const d = gearData.gear.find(item => item.id === g.gearId);
+    return d != null && WEAPON_CATS_SET.has(d.category);
+  });
+  if (!hasWeapon) {
+    const pistolPool = gearData.gear.filter(g => g.category === 'pistol' && nuyen >= g.costNuyen);
+    const pool = pistolPool.length > 0
+      ? pistolPool
+      : gearData.gear.filter(g => WEAPON_CATS_SET.has(g.category) && nuyen >= g.costNuyen);
+    if (pool.length > 0) {
+      const weights = pool.map(p => Math.max(1, p.costNuyen));
+      const pick = weightedPick(rng, pool, weights);
+      gear.push({ gearId: pick.id, costNuyen: pick.costNuyen, quantity: 1 });
+      nuyen -= pick.costNuyen;
     }
   }
 
