@@ -883,6 +883,47 @@ html, body, #root {
 .prog-cat[data-cat="stealth"]   { color: #aa88cc; }
 .prog-cat[data-cat="utility"]   { color: var(--text-dim); }
 
+/* ── Mobile: single-column layout ──────────────────────────────────────────── */
+@media (max-width: 520px) {
+
+  .screen { padding: 1.25rem 0.75rem; }
+
+  /* Header — allow wrapping so buttons don't push off-screen */
+  .sheet-header      { flex-wrap: wrap; }
+  .runner-name       { font-size: 1.2rem; }
+  .header-reroll-row { flex-wrap: wrap; }
+
+  /* Attribute hexes — shrink to fit all 9 in one row */
+  .attr-hex-bar  { padding: 0.4rem 0.5rem; }
+  .attr-hex-row  { gap: 2px; }
+  .hex-outer     { width: 34px; height: 40px; }
+  .hex-inner     { width: 28px; height: 34px; }
+  .hex-value     { font-size: 0.85rem; }
+  .hex-label     { font-size: 0.58rem; }
+
+  /* Attribute meta strip — wrap to second line */
+  .attr-hex-meta {
+    flex-wrap: wrap;
+    row-gap: 0.4rem;
+    column-gap: 0.75rem;
+    font-size: 0.65rem;
+  }
+  .attr-hex-meta .attr-hex-priorities { margin-left: 0; width: 100%; }
+
+  /* All multi-column layouts collapse to one column */
+  .stats-strip   { grid-template-columns: 1fr; }
+  .sheet-columns { grid-template-columns: 1fr; }
+
+  /* Contacts: 2 columns is enough on a phone */
+  .contacts-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Tables that are too wide get a horizontal scroll within their section */
+  .section-body { overflow-x: auto; }
+
+  /* Details label column narrower */
+  .detail-row { grid-template-columns: 5rem 1fr; }
+}
+
 /* Quiz generating state */
 .quiz-generating-text {
   color: var(--accent);
