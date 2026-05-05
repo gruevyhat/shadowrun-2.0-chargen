@@ -21,7 +21,7 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 **Goal:** produce validated SR2 JSON files in `data/sr2/`.
 
 1. **System deps**: install `tesseract`, `poppler` via Homebrew. Set up Python `.venv` in `scripts/` and install deps from `pyproject.toml`.
-2. **OCR pass** at 400 DPI on `547785268-7901-Shadowrun-Second.pdf` → `data/raw/sr2/pages/page_NNNN.md`. Spot-check ~10 pages for quality before doing all 326.
+2. **OCR pass** at 400 DPI on `docs/SR2/core_books/547785268-7901-Shadowrun-Second.pdf` → `data/raw/sr2/pages/page_NNNN.md`. Spot-check ~10 pages for quality before doing all 326.
 3. **Page index**: hand-build `data/raw/sr2/index.md` mapping rule sections (Priority Table, Metatype tables, Skills list, Spells, Gear chapters, Cyberware, etc.) to page ranges. Extraction targets these ranges only.
 4. **Schemas**: write JSON Schemas in `data/schemas/` for each dataset (priority_table, metatypes, skills, spells, gear, cyberware, archetypes). Schemas are the contract between Python tooling and the web app.
 5. **Targeted extractors** (one Python script per dataset under `scripts/extract/`). Each reads OCR output for a specific page range, normalizes, validates against schema, writes to `data/sr2/<name>.json`. Manual review of every output file before committing.

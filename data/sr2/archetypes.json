@@ -52,7 +52,7 @@
       "priorityBias": { "race": 0, "magic": 0, "attributes": 2, "skills": 4, "resources": 3 },
       "attributeWeights": { "body": 2, "quickness": 4, "strength": 2, "charisma": 3, "intelligence": 9, "willpower": 5 },
       "coreSkills": ["computer", "electronics", "computer_theory", "firearms", "etiquette"],
-      "gearTags": ["electronics", "other"],
+      "gearTags": ["cyberdeck", "electronics", "other"],
       "notes": "Very high Intelligence. Resources buy a quality cyberdeck (Fuchi Cyber-4 or better). Datajack essential. High Hacking Pool. Canonical example: Decker (p.53), Elf Decker (p.56)."
     },
     {

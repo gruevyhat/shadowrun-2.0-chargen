@@ -49,8 +49,10 @@ All work in this repo follows this loop. Don't skip steps; the order is load-bea
 - `data/sr2/` — Normalized JSON consumed by the app at build time
 - `data/raw/sr2/` — OCR output, intermediate. Regenerable; not committed.
 - `data/schemas/` — JSON Schemas shared by Python tooling and the web app
-- `docs/core_books/` — Source PDFs (e.g. `547785268-7901-Shadowrun-Second.pdf`)
-- `docs/supplements/`, `docs/adventures/` — Reference PDFs (not used in v1)
+- `docs/SR2/core_books/` — SR2 source PDFs (primary: `547785268-7901-Shadowrun-Second.pdf`)
+- `docs/SR2/supplements/`, `docs/SR2/adventures/` — SR2 reference PDFs (not used in v1)
+- `docs/SR1/core_books/` — SR1 source PDFs (primary: `Shadowrun 1e - Shadowrun First Edition {FASA7101}.pdf`, backlogged)
+- `docs/SR1/supplements/`, `docs/SR1/adventures/` — SR1 reference PDFs (backlogged)
 
 ## Commands
 
@@ -105,4 +107,4 @@ Client-side via `@react-pdf/renderer` so the entire app can ship as a static Git
 ## Backlog
 - SR1 rules support (data extraction + engine branching)
 - Manual character builder (third entry point, fully user-driven)
-- Additional sourcebooks (`docs/supplements/`, future)
+- Additional sourcebooks (`docs/SR2/supplements/`, future)

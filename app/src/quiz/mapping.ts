@@ -23,7 +23,7 @@ type AxisVector = [
   human_metahuman: number,
 ];
 
-const AXIS_ORDER: (keyof AxisScores)[] = [
+export const AXIS_ORDER: (keyof AxisScores)[] = [
   'wired_wild',
   'streetwise_cerebral',
   'iron_empath',

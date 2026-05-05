@@ -17,8 +17,11 @@ function magicConstraints(
 }
 
 // Race priority constraints
+// SR2: humans take E (the lowest), metahumans take A. Higher Race for a
+// human gives nothing back — it just burns a slot that could buy attributes,
+// skills, or resources.
 function raceConstraints(metatypeId: string): PriorityLevel[] {
-  return metatypeId !== 'human' ? ['A'] : ['B', 'C', 'D', 'E'];
+  return metatypeId !== 'human' ? ['A'] : ['E'];
 }
 
 export function assignPriorities(

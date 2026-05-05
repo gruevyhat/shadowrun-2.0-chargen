@@ -23,7 +23,11 @@ export interface CharacterIntent {
   archetype:        ArchetypeId;
   magicDisposition: MagicDisposition;
   metatypeHint?:    MetatypeId;
-  seed:             number; // uint32
+  seed:             number; // uint32 — master seed; derives every section unless overridden
+  axisCode?:        string; // 6-char encoding of quiz axis scores, e.g. "385617"
+  // Per-section seed overrides set by partial rerolls. Each stage uses
+  // seedOverrides[stage] when present, else falls back to childSeed(seed, stage).
+  seedOverrides?:   Partial<Record<'attributes' | 'skills' | 'resources', number>>;
 }
 
 // ── Pipeline intermediates ────────────────────────────────────────────────────
@@ -37,8 +41,10 @@ export type AttributeBlock = Record<AttributeKey, number> & {
 };
 
 export interface SkillRating {
-  skillId: string;
-  rating:  number;
+  skillId:         string;
+  rating:          number;
+  concentration?:  string; // full rating inside; rating-1 outside
+  specialization?: string; // +2 dice within concentration
 }
 
 export interface CyberwareItem {
@@ -64,6 +70,7 @@ export interface Loadout {
   spells:      SpellSelection[];
   remainingNuyen: number;
   remainingForcePoints: number;
+  purchasedContactCount: number;
 }
 
 // ── Character (engine output) ─────────────────────────────────────────────────

@@ -13,7 +13,7 @@ export function spendAttributes(
   metatype: MetatypeId,
   priorities: PriorityAssignment,
 ): AttributeBlock {
-  const rng = makeRng(childSeed(intent.seed, 'attributes'));
+  const rng = makeRng(intent.seedOverrides?.attributes ?? childSeed(intent.seed, 'attributes'));
 
   const meta      = metatypesData.metatypes.find(m => m.id === metatype)!;
   const priRow    = priorityData.priorities.find(p => p.level === priorities.attributes)!;

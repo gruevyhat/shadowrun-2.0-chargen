@@ -14,7 +14,7 @@ export function spendResources(
   priorities: PriorityAssignment,
   attributes: AttributeBlock,
 ): Loadout {
-  const rng = makeRng(childSeed(intent.seed, 'resources'));
+  const rng = makeRng(intent.seedOverrides?.resources ?? childSeed(intent.seed, 'resources'));
 
   const archetype = archetypesData.archetypes.find(a => a.id === intent.archetype)!;
   const priRow    = priorityData.priorities.find(p => p.level === priorities.resources)!;
@@ -86,73 +86,189 @@ export function spendResources(
       gear.push({ gearId: pistol.id, costNuyen: pistol.costNuyen, quantity: 1 });
       nuyen -= pistol.costNuyen;
     }
-    return { cyberware, gear, spells, remainingNuyen: nuyen, remainingForcePoints: forcePoints };
+    // Extra contacts for full magicians (combat_mage/mage/shaman get 0 purchased contacts)
+    const MAGE_MAX_CONTACTS: Record<string, number> = { mage: 0, shaman: 0, combat_mage: 0 };
+    const mageContactMax  = MAGE_MAX_CONTACTS[intent.archetype] ?? 0;
+    const MAGE_CONTACT_COST = 2500;
+    let mageContacts = 0;
+    while (nuyen >= MAGE_CONTACT_COST && mageContacts < mageContactMax) {
+      nuyen -= MAGE_CONTACT_COST;
+      mageContacts++;
+    }
+    return { cyberware, gear, spells, remainingNuyen: nuyen, remainingForcePoints: forcePoints, purchasedContactCount: mageContacts };
   }
 
   // ── Cyberware (mundane / adept archetypes) ────────────────────────────────
   const cyberPool = cyberwareData.cyberware;
 
-  // Archetype-specific priority cyberware
-  const cyberPriority: Record<string, string[]> = {
-    street_samurai: ['wired_reflexes_2', 'smartlink', 'cybereyes'],
-    physical_adept: ['cybereyes'],  // adepts avoid heavy cyberware
-    decker:         ['datajack'],
-    rigger:         ['vehicle_control_rig_2', 'datajack', 'cybereyes'],
-    face:           [],
-    combat_mage:    [],
-    investigator:   [],
-    mage:           [],
-    shaman:         [],
+  // Archetype core picks (always considered first) and an extras pool (randomized)
+  const cyberCore: Record<string, string[][]> = {
+    // Each inner array is a tier of alternatives — one is randomly chosen per tier
+    street_samurai: [
+      ['wired_reflexes_1', 'wired_reflexes_2'],
+      ['smartlink'],
+      ['cybereyes'],
+    ],
+    physical_adept: [['cybereyes']],
+    decker:         [['datajack'], ['chipjack', 'cybereyes']],
+    rigger:         [['vehicle_control_rig_1', 'vehicle_control_rig_2'], ['datajack'], ['cybereyes']],
+    face:           [], combat_mage: [], investigator: [], mage: [], shaman: [],
   };
 
-  const priorityCyber = cyberPriority[intent.archetype] ?? [];
+  const cyberExtras: Record<string, string[]> = {
+    street_samurai: ['cyberears', 'low_light_vision', 'thermographic_vision', 'dermal_plating_1', 'dermal_plating_2', 'muscle_replacement_1', 'muscle_replacement_2', 'hand_razors', 'spur'],
+    physical_adept: ['low_light_vision', 'thermographic_vision'],
+    decker:         ['cybereyes', 'cyberears', 'radio_receive', 'low_light_vision'],
+    rigger:         ['cyberears', 'low_light_vision', 'radio_twoway'],
+    face:           ['cybereyes', 'low_light_vision'],
+    combat_mage:    [], investigator: ['cybereyes', 'low_light_vision'], mage: [], shaman: [],
+  };
 
-  for (const id of priorityCyber) {
+  const tryBuy = (id: string): boolean => {
     const item = cyberPool.find(c => c.id === id);
-    if (!item) continue;
-    if (nuyen < item.costNuyen) continue;
+    if (!item) return false;
+    if (cyberware.find(cw => cw.cyberwareId === id)) return false;
+    if (nuyen < item.costNuyen) return false;
     const newEssence = essenceLeft - item.essenceCost;
-    if (newEssence < MIN_ESSENCE) continue;
-    // Adepts: keep essence ≥ magic attribute
-    if (intent.magicDisposition === 'adept' && newEssence < attributes.magic) continue;
+    if (newEssence < MIN_ESSENCE) return false;
+    if (intent.magicDisposition === 'adept' && newEssence < attributes.magic) return false;
     cyberware.push({ cyberwareId: item.id, essenceCost: item.essenceCost, costNuyen: item.costNuyen });
     nuyen -= item.costNuyen;
     essenceLeft = newEssence;
+    return true;
+  };
+
+  // Core picks: one random alternative per tier
+  for (const tier of cyberCore[intent.archetype] ?? []) {
+    if (tier.length === 0) continue;
+    const pick = tier[randIdx(rng, tier.length)];
+    tryBuy(pick);
+  }
+
+  // Extras: shuffle and try to buy a random subset (0–3 picks)
+  const extras = [...(cyberExtras[intent.archetype] ?? [])];
+  for (let i = extras.length - 1; i > 0; i--) {
+    const j = randIdx(rng, i + 1);
+    [extras[i], extras[j]] = [extras[j], extras[i]];
+  }
+  const extraTarget = randIdx(rng, 4); // 0–3 extras
+  let extrasBought = 0;
+  for (const id of extras) {
+    if (extrasBought >= extraTarget) break;
+    if (tryBuy(id)) extrasBought++;
   }
 
   // ── Gear ──────────────────────────────────────────────────────────────────
-  // Must-have: lifestyle + armor + sidearm
-  const mustHave = ['lifestyle_low', 'armor_jacket'];
-  if (intent.archetype === 'face' || intent.archetype === 'investigator') {
-    mustHave[0] = 'lifestyle_middle';
+  // Must-have lifestyle (fixed by archetype)
+  const lifestyleId = (intent.archetype === 'face' || intent.archetype === 'investigator')
+    ? 'lifestyle_middle' : 'lifestyle_low';
+  const lifestyle = gearData.gear.find(g => g.id === lifestyleId);
+  if (lifestyle && nuyen >= lifestyle.costNuyen) {
+    gear.push({ gearId: lifestyle.id, costNuyen: lifestyle.costNuyen, quantity: 1 });
+    nuyen -= lifestyle.costNuyen;
   }
 
-  for (const id of mustHave) {
-    const item = gearData.gear.find(g => g.id === id);
-    if (item && nuyen >= item.costNuyen) {
-      gear.push({ gearId: item.id, costNuyen: item.costNuyen, quantity: 1 });
-      nuyen -= item.costNuyen;
+  // Must-have armor: random pick from affordable street-grade armor so rerolls vary.
+  // Heavy armor is excluded (purchased as tagged gear when affordable).
+  const armorPool = gearData.gear.filter(g =>
+    g.category === 'armor' &&
+    !g.id.startsWith('heavy_armor') &&
+    nuyen >= g.costNuyen,
+  );
+  if (armorPool.length > 0) {
+    const armor = armorPool[randIdx(rng, armorPool.length)];
+    gear.push({ gearId: armor.id, costNuyen: armor.costNuyen, quantity: 1 });
+    nuyen -= armor.costNuyen;
+  }
+
+  // Tagged gear: pick items matching archetype gear tags.
+  // Multiple armor pieces are fine; duplicate ballistic ratings are not.
+  const ownedBallistic = new Set<number>(
+    gear
+      .map(g => gearData.gear.find(d => d.id === g.gearId))
+      .filter((d): d is (typeof gearData.gear)[0] => d?.category === 'armor' && d.armorBallistic != null)
+      .map(d => d.armorBallistic as number),
+  );
+
+  // Group affordable tagged gear by category so each reroll can vary the pick
+  // within each category (different vehicle, different SMG, etc.).
+  const byCat: Record<string, typeof gearData.gear> = {};
+  for (const g of gearData.gear) {
+    if (!gearTags.includes(g.category)) continue;
+    if (gear.find(existing => existing.gearId === g.id)) continue;
+    (byCat[g.category] ??= []).push(g);
+  }
+
+  let gearCount = 0;
+  // Iterate categories in a randomized order so budget allocation also varies
+  const cats = Object.keys(byCat);
+  for (let i = cats.length - 1; i > 0; i--) {
+    const j = randIdx(rng, i + 1);
+    [cats[i], cats[j]] = [cats[j], cats[i]];
+  }
+
+  for (const cat of cats) {
+    if (gearCount >= 5) break;
+    // Up to 2 picks per category (e.g. two firearms), with weighted random toward
+    // costlier items so big-ticket categories aren't dominated by cheap fillers.
+    const maxPerCat = cat === 'vehicle' ? 1 : 2;
+    let perCatBought = 0;
+    while (perCatBought < maxPerCat && gearCount < 5) {
+      const pool = byCat[cat].filter(item => {
+        if (nuyen < item.costNuyen) return false;
+        if (gear.find(g => g.gearId === item.id)) return false;
+        const bal = (item as { armorBallistic?: number }).armorBallistic;
+        if (item.category === 'armor' && bal != null && ownedBallistic.has(bal)) return false;
+        return true;
+      });
+      if (pool.length === 0) break;
+      const weights = pool.map(p => Math.max(1, p.costNuyen));
+      const pick = weightedPick(rng, pool, weights);
+      gear.push({ gearId: pick.id, costNuyen: pick.costNuyen, quantity: 1 });
+      nuyen -= pick.costNuyen;
+      gearCount++;
+      perCatBought++;
+      const bal = (pick as { armorBallistic?: number }).armorBallistic;
+      if (pick.category === 'armor' && bal != null) ownedBallistic.add(bal);
     }
   }
 
-  // Tagged gear: pick items matching archetype gear tags
-  const tagged = gearData.gear.filter(g =>
-    gearTags.includes(g.category) &&
-    !gear.find(existing => existing.gearId === g.id),
-  );
-
-  // Sort by cost descending, buy what we can afford (up to 5 items)
-  tagged.sort((a, b) => b.costNuyen - a.costNuyen);
-  let gearCount = 0;
-  for (const item of tagged) {
-    if (gearCount >= 5) break;
-    if (nuyen < item.costNuyen) continue;
-    gear.push({ gearId: item.id, costNuyen: item.costNuyen, quantity: 1 });
-    nuyen -= item.costNuyen;
-    gearCount++;
+  // ── Random misc items (1d6) ─────────────────────────────────────────────
+  const miscPool = gearData.gear.filter(g => g.category === 'misc');
+  if (miscPool.length > 0) {
+    const count = randIdx(rng, 6) + 1;
+    const available = [...miscPool];
+    for (let i = 0; i < count && available.length > 0; i++) {
+      const idx = randIdx(rng, available.length);
+      const item = available.splice(idx, 1)[0];
+      if (nuyen >= item.costNuyen && !gear.find(g => g.gearId === item.id)) {
+        gear.push({ gearId: item.id, costNuyen: item.costNuyen, quantity: 1 });
+        nuyen -= item.costNuyen;
+      }
+    }
   }
 
-  return { cyberware, gear, spells, remainingNuyen: nuyen, remainingForcePoints: forcePoints };
+  // ── Extra contacts (2500¥ each, archetype-capped) ────────────────────────
+  const ARCHETYPE_MAX_CONTACTS: Record<string, number> = {
+    face:           4,
+    investigator:   3,
+    decker:         2,
+    mage:           0,
+    shaman:         0,
+    street_samurai: 1,
+    physical_adept: 1,
+    rigger:         1,
+    combat_mage:    0,
+  };
+  const CONTACT_COST   = 2500;
+  const maxContacts    = ARCHETYPE_MAX_CONTACTS[intent.archetype] ?? 1;
+  let purchasedContactCount = 0;
+  while (nuyen >= CONTACT_COST && purchasedContactCount < maxContacts) {
+    nuyen -= CONTACT_COST;
+    purchasedContactCount++;
+  }
+
+  return { cyberware, gear, spells, remainingNuyen: nuyen, remainingForcePoints: forcePoints, purchasedContactCount };
 }
 
 function randIdx(rng: () => number, len: number): number {
