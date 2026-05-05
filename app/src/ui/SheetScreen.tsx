@@ -7,7 +7,7 @@ import { generateDemographics } from './demographicsGenerator';
 import { generateAdditionalDetails } from './additionalDetailsGenerator';
 import { generatePrograms } from './programsGenerator';
 import { serializeCode, decodeAxes } from './characterCode';
-import { CharacterPdf, buildPdfData, pdf } from './CharacterPdf';
+import { CharacterPdf, buildPdfData, buildMarkdown, pdf } from './CharacterPdf';
 import type { ArchetypeId, MagicDisposition } from '../engine/types';
 import skillsData    from '../../../data/sr2/skills.json';
 import gearData      from '../../../data/sr2/gear.json';
@@ -352,6 +352,18 @@ export function SheetScreen() {
     }) });
   }
 
+  function handleExportMarkdown() {
+    const data     = buildPdfData(character, { runnerName, archetypeName, demographics, contacts, details, characterCode });
+    const md       = buildMarkdown(data);
+    const blob     = new Blob([md], { type: 'text/markdown; charset=utf-8' });
+    const url      = URL.createObjectURL(blob);
+    const a        = document.createElement('a');
+    a.href         = url;
+    a.download     = `${runnerName.replace(/\s+/g, '_')}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async function handleExportPdf() {
     const data = buildPdfData(character, { runnerName, archetypeName, demographics, contacts, details, characterCode });
     const blob  = await pdf(<CharacterPdf data={data} />).toBlob();
@@ -433,6 +445,7 @@ export function SheetScreen() {
           </button>
           <div className="header-reroll-row">
             <button className="btn btn-secondary btn-sm" onClick={handleRerollAll}>REROLL ALL</button>
+            <button className="btn btn-secondary btn-sm" onClick={handleExportMarkdown}>EXPORT MD</button>
             <button className="btn btn-secondary btn-sm" onClick={handleExportPdf}>EXPORT PDF</button>
           </div>
         </div>

@@ -241,6 +241,172 @@ export function buildPdfData(
   };
 }
 
+// ── Markdown export ───────────────────────────────────────────────────────────
+
+export function buildMarkdown(data: PdfData): string {
+  const L: string[] = [];
+  const push = (...lines: string[]) => L.push(...lines);
+  const hr = () => push('', '---', '');
+
+  push(
+    `# ${data.runnerName} — ${data.archetypeName}`,
+    '',
+    `**${data.metatypeName} ${data.sex === 'M' ? 'Male' : 'Female'} · Age ${data.age} · ${data.magicLabel} · ${data.origin}**  `,
+    `Runner ID: \`${data.characterCode}\``,
+  );
+  hr();
+
+  // Attributes
+  push('## Attributes', '');
+  push('| ' + data.attrs.map(a => a.abbr).join(' | ') + ' |');
+  push('|' + data.attrs.map(() => ':---:').join('|') + '|');
+  push('| ' + data.attrs.map(a => {
+    if (a.isDim) return '—';
+    return Number.isInteger(a.val) ? String(a.val) : a.val.toFixed(1);
+  }).join(' | ') + ' |');
+  push('');
+  push(`**Initiative:** ${data.initLabel}  ·  **Cash:** ¥${data.startingCash.toLocaleString()}  ·  **Karma Pool:** ${data.karmaPool}  `);
+  push(`**Priorities:** ${data.priorityDisplay}`);
+  hr();
+
+  // Condition monitors
+  push('## Condition Monitor', '');
+  const boxes = (n: number) => Array.from({ length: n }, () => '☐').join(' ');
+  push(`**Physical:** ${boxes(3)}  L  ${boxes(3)}  M  ${boxes(3)}  S  ${boxes(1)}  D  `);
+  push(`**Stun:**     ${boxes(3)}  L  ${boxes(3)}  M  ${boxes(3)}  S  ${boxes(1)}  D  `);
+  hr();
+
+  // Dice pools
+  push('## Dice Pools', '');
+  push('| Pool | Dice |');
+  push('|------|:----:|');
+  push(`| Combat | ${data.combatPool} |`);
+  push(`| Task | ${data.taskPool} |`);
+  if (data.spellPool !== null) push(`| Spell | ${data.spellPool} |`);
+  push(`| Karma | ${data.karmaPool} |`);
+  hr();
+
+  // Protection
+  if (data.armors.length > 0) {
+    push('## Protection', '');
+    push('| Armor | B | I |');
+    push('|-------|:---:|:---:|');
+    for (const a of data.armors)
+      push(`| ${a.name} | ${a.armorBallistic ?? '—'} | ${a.armorImpact ?? '—'} |`);
+    hr();
+  }
+
+  // Weapons
+  if (data.weapons.length > 0) {
+    push('## Weapons', '');
+    push('| Weapon | Dmg | Mode | Ammo | Conc | Range (S/M/L/E) |');
+    push('|--------|:---:|:----:|:----:|:----:|:---------------:|');
+    for (const w of data.weapons)
+      push(`| ${w.name} | ${w.damageCode ?? '—'} | ${w.fireMode ?? '—'} | ${w.ammoCapacity ?? '—'} | ${w.concealability ?? '—'} | ${w.ranges ? w.ranges.join('/') : '—'} |`);
+    hr();
+  }
+
+  // Skills
+  push('## Skills', '');
+  push('| Skill | Rating | Concentration | Specialization |');
+  push('|-------|:------:|---------------|----------------|');
+  for (const sk of data.skills) {
+    const conc = sk.concentration ? `${sk.concentration} (${sk.concRating})` : '—';
+    const spec = sk.specialization ? `${sk.specialization} (${sk.specRating})` : '—';
+    push(`| ${sk.name} | ${sk.generalRating} | ${conc} | ${spec} |`);
+  }
+  hr();
+
+  // Cyberware
+  if (data.cyberware.length > 0) {
+    push('## Cyberware', '');
+    push('| Implant | Essence | Effect |');
+    push('|---------|:-------:|--------|');
+    for (const cw of data.cyberware)
+      push(`| ${cw.name} | ${cw.essenceCost.toFixed(1)}E | ${cw.effect ?? '—'} |`);
+    hr();
+  }
+
+  // Spells
+  if (data.spells.length > 0) {
+    push('## Spells', '');
+    push('| Spell | Category | Type | Force | Drain | Target |');
+    push('|-------|----------|------|:-----:|:-----:|--------|');
+    for (const sp of data.spells) {
+      const cat = sp.category.charAt(0).toUpperCase() + sp.category.slice(1);
+      push(`| ${sp.name} | ${cat} | ${sp.typePhy ? 'Physical' : 'Mana'} | ${sp.force} | ${sp.drainCode ?? '—'} | ${sp.target ?? '—'} |`);
+    }
+    hr();
+  }
+
+  // Cyberdeck
+  if (data.decks.length > 0) {
+    push('## Cyberdeck', '');
+    push('| Deck | MPCP | Hardening | Active | Storage | I/O | +Response |');
+    push('|------|:----:|:---------:|:------:|:-------:|:---:|:---------:|');
+    for (const d of data.decks)
+      push(`| ${d.name} | ${d.mpcp ?? '—'} | ${d.hardening ?? '—'} | ${d.activeMb != null ? `${d.activeMb}Mb` : '—'} | ${d.storageMb != null ? `${d.storageMb}Mb` : '—'} | ${d.ioSpeed ?? '—'} | +${d.responseIncrease ?? 0} |`);
+    hr();
+  }
+
+  // Equipment
+  if (data.gear.length > 0 || data.lifestyle) {
+    push('## Equipment', '');
+    for (const g of data.gear)
+      push(`- ${g.name}${g.costNuyen > 0 ? ` (¥${g.costNuyen.toLocaleString()})` : ''}`);
+    if (data.lifestyle)
+      push(`- **Lifestyle:** ${data.lifestyle}`);
+    hr();
+  }
+
+  // Vehicles
+  if (data.vehicles.length > 0) {
+    push('## Vehicles', '');
+    push('| Vehicle | Hand | Speed | Accel | Body | Armor | Sig | Pilot | Seats |');
+    push('|---------|:----:|:-----:|:-----:|:----:|:-----:|:---:|:-----:|:-----:|');
+    for (const v of data.vehicles)
+      push(`| ${v.name} | ${v.vehHandling ?? '—'} | ${v.vehSpeed ?? '—'} | ${v.vehAccel ?? '—'} | ${v.vehBody ?? '—'} | ${v.vehArmor ?? '—'} | ${v.vehSignature ?? '—'} | ${v.vehPilot ?? '—'} | ${v.vehSeats ?? '—'} |`);
+    hr();
+  }
+
+  // Contacts
+  if (data.contacts.length > 0) {
+    push('## Contacts', '');
+    push('| Name | Role | Loyalty | Connection |');
+    push('|------|------|:-------:|:----------:|');
+    for (const c of data.contacts)
+      push(`| ${c.name} | ${c.role} | ${c.loyalty} | ${c.connection} |`);
+    hr();
+  }
+
+  // Racial traits
+  if (data.metatypeTraits) {
+    push('## Racial Traits', '');
+    push(data.metatypeTraits.replace(/  ·  /g, '  \n'));
+    hr();
+  }
+
+  // Details
+  push('## Additional Details', '');
+  for (const [label, value] of [
+    ['Legal Name',    data.realName],
+    ['Past',          data.pastProfession],
+    ['Personality',   data.personality],
+    ['Moral Code',    data.moralCode],
+    ['Goals',         data.goals],
+    ['Loves / Hates', data.lovesHates],
+    ['Languages',     data.languages],
+    ['Appearance',    data.appearance],
+  ] as [string, string][])
+    push(`**${label}:** ${value}  `);
+  push('', '### Background', '', data.background, '');
+
+  push('---', '');
+  push(`*Shadowrun 2nd Edition · Runner ID: \`${data.characterCode}\`*`);
+
+  return L.join('\n');
+}
+
 // ── Color palette ─────────────────────────────────────────────────────────────
 
 const C = {
