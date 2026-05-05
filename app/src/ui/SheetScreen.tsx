@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp } from './store';
-import { generate, reroll, type RerollSection } from '../engine/generate';
+import { generate } from '../engine/generate';
 import { generateName } from './nameGenerator';
 import { generateContacts } from './contactsGenerator';
 import { generateDemographics } from './demographicsGenerator';
@@ -191,20 +191,14 @@ function Pips({ rating }: { rating: number }) {
 
 interface SectionProps {
   label: string;
-  section: RerollSection;
-  onReroll: (s: RerollSection) => void;
   children: React.ReactNode;
-  noReroll?: boolean;
 }
 
-function Section({ label, section, onReroll, children, noReroll }: SectionProps) {
+function Section({ label, children }: SectionProps) {
   return (
     <div className="sheet-section">
       <div className="section-header">
         <span className="section-label">{label}</span>
-        {!noReroll && (
-          <button className="btn-reroll" onClick={() => onReroll(section)} title={`Re-roll ${label}`}>⟳</button>
-        )}
       </div>
       <div className="section-body">{children}</div>
     </div>
@@ -350,10 +344,6 @@ export function SheetScreen() {
 
   // ── Handlers ────────────────────────────────────────────────────────────
 
-  function handleReroll(section: RerollSection) {
-    dispatch({ type: 'REROLL_CHARACTER', character: reroll(character, section, newSeed()) });
-  }
-
   function handleRerollAll() {
     const pick = ALL_ARCHETYPES[Math.floor(Math.random() * ALL_ARCHETYPES.length)];
     dispatch({ type: 'REROLL_CHARACTER', character: generate({
@@ -437,7 +427,6 @@ export function SheetScreen() {
 
       {/* ── Hex Attribute Row ── */}
       <div className="attr-hex-bar">
-        <button className="btn-reroll attr-hex-reroll" onClick={() => handleReroll('attributes')} title="Re-roll Attributes">⟳</button>
         <div className="attr-hex-row">
           {ATTRS.map(([abbr, , val]) => {
             const display    = !Number.isInteger(val) ? val.toFixed(1) : String(val);
@@ -472,7 +461,7 @@ export function SheetScreen() {
 
       {/* ── Stats strip: Condition Monitor | Dice Pools | Protection ── */}
       <div className="stats-strip">
-        <Section label="CONDITION MONITOR" section="attributes" onReroll={handleReroll} noReroll>
+        <Section label="CONDITION MONITOR">
           <div className="condition-body">
             {([
               ['PHYSICAL', physHit, (i: number) => toggleBox(physHit, setPhysHit, i)],
@@ -505,7 +494,7 @@ export function SheetScreen() {
           </div>
         </Section>
 
-        <Section label="DICE POOLS" section="attributes" onReroll={handleReroll} noReroll>
+        <Section label="DICE POOLS">
           <div className="pool-list">
             {([
               ['Combat',  combatPool],
@@ -527,7 +516,7 @@ export function SheetScreen() {
         </Section>
 
         {armors.length > 0 ? (
-          <Section label="PROTECTION" section="resources" onReroll={handleReroll}>
+          <Section label="PROTECTION">
             <table className="combat-table">
               <thead>
                 <tr><th>Armor</th><th>B</th><th>I</th></tr>
@@ -547,7 +536,7 @@ export function SheetScreen() {
             </table>
           </Section>
         ) : (
-          <Section label="PROTECTION" section="resources" onReroll={handleReroll} noReroll>
+          <Section label="PROTECTION">
             <p className="background-text">No armor.</p>
           </Section>
         )}
@@ -555,7 +544,7 @@ export function SheetScreen() {
 
       {/* ── Racial Traits (non-humans only) ── */}
       {metatypeData?.isMetahuman && (
-        <Section label="RACIAL TRAITS" section="metatype" onReroll={handleReroll} noReroll>
+        <Section label="RACIAL TRAITS">
           <div className="racial-traits">
             {Object.entries(metatypeData.attributeMods).length > 0 && (
               <div className="racial-mods">
@@ -575,7 +564,7 @@ export function SheetScreen() {
 
       {/* ── Weapons (full width, gated) ── */}
       {weapons.length > 0 && (
-        <Section label="WEAPONS" section="resources" onReroll={handleReroll}>
+        <Section label="WEAPONS">
           <table className="combat-table">
             <thead>
               <tr>
@@ -604,7 +593,7 @@ export function SheetScreen() {
 
       {/* ── Spells (full width, gated) ── */}
       {allSpells.length > 0 && (
-        <Section label="SPELLS" section="resources" onReroll={handleReroll}>
+        <Section label="SPELLS">
           <table className="combat-table">
             <thead>
               <tr>
@@ -633,7 +622,7 @@ export function SheetScreen() {
 
       {/* ── Skills | Gear (tall pair) ── */}
       <div className="sheet-columns">
-        <Section label="SKILLS" section="skills" onReroll={handleReroll}>
+        <Section label="SKILLS">
           <ul className="skill-list">
             {topSkills.map(s => {
               // SR2 concentration/specialization math (p.47-48)
@@ -675,7 +664,7 @@ export function SheetScreen() {
         <div className="sheet-col">
           {/* Cyberware in own section */}
           {loadout.cyberware.length > 0 && (
-            <Section label="CYBERWARE" section="resources" onReroll={handleReroll}>
+            <Section label="CYBERWARE">
               <ul className="loadout-list">
                 {loadout.cyberware.map(cw => {
                   const data = cyberMap[cw.cyberwareId] as { name: string; effect?: string } | undefined;
@@ -693,7 +682,7 @@ export function SheetScreen() {
             </Section>
           )}
 
-          <Section label="GEAR" section="resources" onReroll={handleReroll}>
+          <Section label="GEAR">
             {otherGear.length > 0 && (
               <div className="loadout-group">
                 <ul className="loadout-list">
@@ -738,7 +727,7 @@ export function SheetScreen() {
 
       {/* ── Cyberdeck (full width, gated) ── */}
       {cyberdecks.length > 0 && (
-        <Section label="CYBERDECK" section="resources" onReroll={handleReroll}>
+        <Section label="CYBERDECK">
           {/* Decks table */}
           <table className="combat-table">
             <thead>
@@ -814,7 +803,7 @@ export function SheetScreen() {
 
       {/* ── Vehicles (full width, gated) ── */}
       {vehicleList.length > 0 && (
-        <Section label="VEHICLES" section="resources" onReroll={handleReroll}>
+        <Section label="VEHICLES">
           {vehicleList.map(({ item, data }) => {
             const d       = data!;
             const cmBoxes = (d.vehBody ?? 3) * 2;
@@ -861,7 +850,7 @@ export function SheetScreen() {
       )}
 
       {/* ── Contacts (full width) ── */}
-      <Section label="CONTACTS" section="skills" onReroll={handleReroll} noReroll>
+      <Section label="CONTACTS">
         <div className="contacts-grid">
           {contacts.map((c, i) => (
             <div key={i} className="contact-card">
@@ -879,7 +868,7 @@ export function SheetScreen() {
       </Section>
 
       {/* ── Additional Details (always last) ── */}
-      <Section label="ADDITIONAL DETAILS" section="all" onReroll={handleReroll} noReroll>
+      <Section label="ADDITIONAL DETAILS">
         <div className="details-grid">
           <div className="detail-row">
             <span className="detail-label">Legal Name</span>
