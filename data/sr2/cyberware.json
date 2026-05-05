@@ -28,6 +28,15 @@
     { "id": "hand_razors",       "name": "Hand Razors",         "category": "cyberweapon","essenceCost": 0.3,"costNuyen": 4500,  "effect": "2.5cm blades replacing fingernails. Unarmed combat weapon.", "notes": "Retractable version 9,000¥." },
     { "id": "spur",              "name": "Spur",                "category": "cyberweapon","essenceCost": 0.5,"costNuyen": 7000,  "effect": "Bone-anchored blade. Retractable version 11,500¥." },
     { "id": "cyberarm",          "name": "Cyberarm (replacement)","category":"cyberlimp","essenceCost": 1.0,"costNuyen": 50000,  "effect": "Full arm replacement, no special abilities. Pair counts as 1 level dermal armor." },
-    { "id": "cyberleg",          "name": "Cyberleg (replacement)","category":"cyberlimp","essenceCost": 1.0,"costNuyen": 50000,  "effect": "Full leg replacement, no special abilities. Pair counts as 1 level dermal armor." }
+    { "id": "cyberleg",              "name": "Cyberleg (replacement)",     "category": "cyberlimp",  "essenceCost": 1.0,  "costNuyen": 50000,  "effect": "Full leg replacement, no special abilities. Pair counts as 1 level dermal armor." },
+    { "id": "boosted_reflexes_1",    "name": "Boosted Reflexes 1",         "category": "bodyware",   "essenceCost": 0.5,  "costNuyen": 15000,  "effect": "+1D6 Initiative die. One-time biotreatment; cannot combine with Wired Reflexes or VCR; cannot be upgraded." },
+    { "id": "boosted_reflexes_2",    "name": "Boosted Reflexes 2",         "category": "bodyware",   "essenceCost": 1.25, "costNuyen": 40000,  "effect": "+1 Reaction, +1D6 Initiative. Cannot combine with Wired Reflexes or VCR; cannot be upgraded." },
+    { "id": "boosted_reflexes_3",    "name": "Boosted Reflexes 3",         "category": "bodyware",   "essenceCost": 2.8,  "costNuyen": 90000,  "effect": "+2 Reaction, +2D6 Initiative. Cannot combine with Wired Reflexes or VCR; cannot be upgraded." },
+    { "id": "vision_mag_optical_1",  "name": "Optical Vision Magnification 1","category": "senseware","essenceCost": 0.2, "costNuyen": 2500,   "effect": "×2 magnification (equiv. Mag-2 imaging scope). Obvious on organic eye; concealable if covered." },
+    { "id": "vision_mag_optical_2",  "name": "Optical Vision Magnification 2","category": "senseware","essenceCost": 0.2, "costNuyen": 4000,   "effect": "×4 magnification (equiv. Mag-4 imaging scope)." },
+    { "id": "vision_mag_optical_3",  "name": "Optical Vision Magnification 3","category": "senseware","essenceCost": 0.2, "costNuyen": 6000,   "effect": "×10 magnification (equiv. Mag-10 imaging scope)." },
+    { "id": "vision_mag_elec_1",     "name": "Electronic Vision Magnification 1","category": "senseware","essenceCost": 0.1,"costNuyen": 3500,  "effect": "×2 magnification. Fully concealed; grainier image than optical." },
+    { "id": "vision_mag_elec_2",     "name": "Electronic Vision Magnification 2","category": "senseware","essenceCost": 0.1,"costNuyen": 7500,  "effect": "×4 magnification." },
+    { "id": "vision_mag_elec_3",     "name": "Electronic Vision Magnification 3","category": "senseware","essenceCost": 0.1,"costNuyen": 11000, "effect": "×10 magnification." }
   ]
 }
