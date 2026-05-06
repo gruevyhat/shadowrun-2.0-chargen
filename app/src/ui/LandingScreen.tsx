@@ -5,6 +5,8 @@ import { generate } from '../engine/generate';
 import type { ArchetypeId, MagicDisposition } from '../engine/types';
 import { parseCode, encodeAxes, decodeManualBuild } from './characterCode';
 import type { Contact } from './contactsGenerator';
+import { loadGallery, removeFromGallery } from './gallery';
+import type { GalleryEntry } from './gallery';
 
 const ARCHETYPES: { id: ArchetypeId; magic: MagicDisposition }[] = [
   { id: 'bodyguard',          magic: 'mundane'    },
@@ -75,6 +77,7 @@ export function LandingScreen() {
   const [seedInput,   setSeedInput]   = useState('');
   const [seedError,   setSeedError]   = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+  const [gallery,     setGallery]     = useState<GalleryEntry[]>(() => loadGallery());
   const mdInputRef = useRef<HTMLInputElement>(null);
 
   function handleRandom() {
@@ -108,6 +111,27 @@ export function LandingScreen() {
   function handleSeedChange(value: string) {
     setSeedInput(value);
     if (seedError) setSeedError(false);
+  }
+
+  function handleLoadEntry(code: string) {
+    if (code.startsWith('m:')) {
+      const character = decodeManualBuild(code);
+      if (character) dispatch({ type: 'SHOW_CHARACTER', character });
+      return;
+    }
+    const parsed = parseCode(code);
+    if (!parsed) return;
+    dispatch({ type: 'SHOW_CHARACTER', character: generate({
+      edition:          'sr2',
+      archetype:        parsed.archetype,
+      magicDisposition: parsed.magicDisposition,
+      seed:             parsed.seed,
+      ...(parsed.axisScores ? { axisCode: encodeAxes(parsed.axisScores) } : {}),
+    }) });
+  }
+
+  function handleDeleteEntry(code: string) {
+    setGallery(removeFromGallery(code));
   }
 
   function handleImportMd(e: React.ChangeEvent<HTMLInputElement>) {
@@ -189,6 +213,28 @@ export function LandingScreen() {
           </form>
           {seedError && <span className="seed-load-error-text">Invalid seed format.</span>}
         </div>
+
+        {gallery.length > 0 && (
+          <div className="gallery-section">
+            <p className="gallery-heading">// SAVED RUNNERS</p>
+            <div className="gallery-list">
+              {gallery.map(entry => (
+                <div key={entry.code} className="gallery-entry">
+                  <div className="gallery-info">
+                    <div className="gallery-name">{entry.name}</div>
+                    <div className="gallery-meta">
+                      {entry.archetype.toUpperCase()} · {new Date(entry.savedAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="gallery-actions">
+                    <button className="gallery-btn" onClick={() => handleLoadEntry(entry.code)}>LOAD</button>
+                    <button className="gallery-btn gallery-btn-del" onClick={() => handleDeleteEntry(entry.code)}>✕</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="landing-footer">

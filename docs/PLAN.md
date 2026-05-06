@@ -176,7 +176,9 @@ _(v1 backlog cleared 2026-05-05)_
 
 ## Status
 
-**Phase 7 done** (2026-05-06). Grimoire 2e spells added: 35 → 106 spells (combat 32, detection 15, health 12, illusion 16, manipulation 31). All validate against schema; 40 tests pass. Next: Phase 9 (QoL) or Phase 10 (portraits).
+**Phase 9 done** (2026-05-06). Share links (URL hash → auto-load character), localStorage gallery (save/load/delete up to 20 runners). Radar chart was already live. Next: Phase 10 (portraits).
+
+**Phase 7 done** (2026-05-06). Grimoire 2e spells added: 35 → 106 spells (combat 32, detection 15, health 12, illusion 16, manipulation 31).
 
 **Phase 8 done** (2026-05-06). Manual character builder wizard live.
 

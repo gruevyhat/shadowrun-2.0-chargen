@@ -8,6 +8,7 @@ import { generateAdditionalDetails } from './additionalDetailsGenerator';
 import { generatePrograms } from './programsGenerator';
 import { serializeCode, decodeAxes } from './characterCode';
 import { CharacterPdf, buildPdfData, buildMarkdown, pdf } from './CharacterPdf';
+import { saveToGallery } from './gallery';
 import { augmentAttributes } from '../engine/augmentations';
 import { resolveWeaponDamage } from '../engine/damageCodes';
 import type { ArchetypeId, MagicDisposition } from '../engine/types';
@@ -215,7 +216,9 @@ function Section({ label, children }: SectionProps) {
 
 export function SheetScreen() {
   const { state, dispatch } = useApp();
-  const [copied, setCopied] = useState(false);
+  const [copied,    setCopied]    = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [saved,     setSaved]     = useState(false);
   const screenState = state.screen.tag === 'sheet' ? state.screen : null;
   const identityOverrides = screenState?.identityOverrides ?? null;
   const activeSeed = screenState?.character.intent.seed ?? -1;
@@ -429,6 +432,20 @@ export function SheetScreen() {
     });
   }
 
+  function handleCopyLink() {
+    const url = window.location.href.split('#')[0] + '#' + characterCode;
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 1500);
+    });
+  }
+
+  function handleSaveToGallery() {
+    saveToGallery({ code: characterCode, name: runnerName, archetype: archetypeName, savedAt: new Date().toISOString() });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  }
+
   function toggleBox(set: Set<number>, setFn: React.Dispatch<React.SetStateAction<Set<number>>>, i: number) {
     const next = new Set(set);
     if (next.has(i)) next.delete(i); else next.add(i);
@@ -474,6 +491,8 @@ export function SheetScreen() {
             <button className="btn btn-secondary btn-sm" onClick={handleRerollAll}>REROLL ALL</button>
             <button className="btn btn-secondary btn-sm" onClick={handleExportMarkdown}>EXPORT MD</button>
             <button className="btn btn-secondary btn-sm" onClick={handleExportPdf}>EXPORT PDF</button>
+            <button className="btn btn-secondary btn-sm" onClick={handleCopyLink}>{linkCopied ? 'COPIED!' : 'SHARE'}</button>
+            <button className="btn btn-secondary btn-sm" onClick={handleSaveToGallery}>{saved ? 'SAVED!' : 'SAVE'}</button>
           </div>
         </div>
       </div>
