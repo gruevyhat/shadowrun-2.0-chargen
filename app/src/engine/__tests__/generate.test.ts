@@ -6,7 +6,7 @@ import type { ArchetypeId, CharacterIntent, MagicDisposition } from '../types';
 const ARCHETYPES: ArchetypeId[] = [
   'bodyguard', 'combat_mage', 'decker', 'detective',
   'former_company_man', 'former_wage_mage', 'gang_member', 'mercenary',
-  'rigger', 'shaman', 'street_mage', 'street_samurai',
+  'physical_adept', 'rigger', 'shaman', 'street_mage', 'street_samurai',
   'street_shaman', 'tribesman',
 ];
 
@@ -19,6 +19,7 @@ const MAGIC_BY_ARCHETYPE: Record<ArchetypeId, MagicDisposition> = {
   former_wage_mage:   'full_magic',
   gang_member:        'mundane',
   mercenary:          'mundane',
+  physical_adept:     'adept',
   rigger:             'mundane',
   shaman:             'full_magic',
   street_mage:        'full_magic',

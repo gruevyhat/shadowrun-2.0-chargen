@@ -85,6 +85,14 @@ export function validate(c: Character): ValidationReport {
     errors.push({ field: 'attributes.magic', message: 'Mundane characters must have Magic 0.' });
   }
 
+  // ── Adept powers ─────────────────────────────────────────────────────────
+  if (disposition === 'adept' && c.loadout.adeptPowers.length > 0) {
+    const totalCost = c.loadout.adeptPowers.reduce((s, p) => s + p.magicCost, 0);
+    if (totalCost > c.attributes.magic + 0.01) {
+      errors.push({ field: 'loadout.adeptPowers', message: `Adept power cost ${totalCost.toFixed(1)} exceeds Magic attribute ${c.attributes.magic}.` });
+    }
+  }
+
   // ── Reaction ─────────────────────────────────────────────────────────────
   const expectedReaction = Math.floor((c.attributes.quickness + c.attributes.intelligence) / 2);
   if (c.attributes.reaction !== expectedReaction) {

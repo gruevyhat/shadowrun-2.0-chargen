@@ -45,6 +45,11 @@ const ARCHETYPE_BACKGROUNDS: Record<ArchetypeId, string[]> = {
     'The gang is family. The turf is home. {name} is {flavor}, defending both with everything available.',
     'Corporate security calls them a threat. The people on the block call them protection. {flavor_cap}. {name} knows which opinion matters.',
   ],
+  physical_adept: [
+    '{name} is Awakened without a tradition — no spells, no spirits, just raw magic channelled inward. {flavor_cap}, and the results speak for themselves.',
+    'The corp tried to run tests. {name} walked out. {flavor_cap} — a body attuned to magic, trained to a standard the academics have no charts for.',
+    'No cyberware, no augmentation. {name} does not need it. {flavor_cap}, moving through threats at a speed that looks like cheating.',
+  ],
   mercenary: [
     'Three tours, a clean record, and a credstick number for inquiries. {name} is {flavor} — professional, portable, priced accordingly.',
     '{name} works for the corp, the polyclubs, or the revolution, as long as the contract is honoured. {flavor_cap}. The work is the work.',

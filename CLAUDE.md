@@ -94,10 +94,13 @@ Pipeline runs as discrete stages — priority assignment → metatype + attribut
 The quiz's output vector becomes a `CharacterIntent`; from there the same engine pipeline runs. Game mechanics stay opaque to the user.
 
 ### Archetypes (v1)
-Street Samurai, Mage, Shaman, Physical Adept, Decker, Rigger, Face, Combat Mage, Investigator. Each has an archetype template that biases priority assignment, attribute weights, skill focus, and gear loadout.
+14 canonical SR2 archetypes from pages 51–67 of the core rulebook: Bodyguard, Combat Mage, Decker, Detective, Former Company Man, Former Wage Mage, Gang Member, Mercenary, Rigger, Shaman, Street Mage, Street Samurai, Street Shaman, Tribesman. Each has an archetype template that biases priority assignment, attribute weights, skill focus, and gear loadout.
 
 ### PDF export
 Client-side via `@react-pdf/renderer` so the entire app can ship as a static GitHub Pages bundle. SR2 layout only in v1.
+
+## Rules questions
+Any question about SR2 rules must be answered from primary sources — `data/sr2/` JSON or the PDFs in `docs/SR2/core_books/`. Do not rely on training-data knowledge of Shadowrun rules; the books are present and should be read directly.
 
 ## Constraints
 - Final user artifact must be a single static HTML/JS bundle, no backend.

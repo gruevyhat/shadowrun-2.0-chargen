@@ -84,14 +84,16 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 
 ## Backlog
 - **Physical adept powers**: Adepts have Magic attribute modeled but powers (Improved Reflexes, Killing Hands, etc.) are not purchased from resources — adept resource spend currently mirrors mundane archetypes.
-- **Combat mage vs mage differentiation**: Both produce similar characters; `archetypes.json` `coreSkills` and spell-picking logic need separate handling for combat mage (combat-focused spells, higher Body/Willpower weights).
-- **Archetype tuning**: Priority bias and attribute weight values in `archetypes.json` were set by intuition; a tuning pass against canonical SR2 archetype stats would improve fidelity.
-- **Reroll-resources budget allocation**: weighted-random per-category picks can exhaust nuyen on early categories before the loop reaches later ones; consider reserving budget per category up front.
-- **Concentration validation coverage**: only firearms/melee categories are checked against owned weapons; thrown weapons, projectile weapons, and gunnery aren't yet validated.
 
 ## Status
 
-**Phases 1–6 complete** (2026-05-04). All v1 milestones done. App live at https://gruevyhat.github.io/shadowrun-2.0-chargen/
+**Phases 1–6 complete plus backlog tuning pass** (2026-05-05). All v1 milestones done plus:
+- Archetype tuning: `former_company_man` body/quickness/strength weights balanced; `rigger` quickness/intelligence weights equalized; `mercenary` and `combat_mage` gearTags corrected against canonical gear (p.55, p.52, p.60).
+- Resource budget reserve: 500¥ held back before tagged gear loop so weapon guarantee always has budget.
+- Concentration validation: WEAPON_CONC_CATS extended to cover gunnery (Machine Guns, Assault Cannon), projectile_weapons (Bows, Crossbows), and throwing_weapons (Shafted, Non-Aerodynamic, Aerodynamic).
+- Combat mage differentiation: picks 3–4 combat spells and 7–8 total (vs 2 combat / 5 total for other mages), matching canonical p.52 loadout.
+
+App live at https://gruevyhat.github.io/shadowrun-2.0-chargen/
 
 **Key decisions (Phase 5):**
 - Two-page PDF layout: page 1 = combat sheet (attrs, weapons, skills, cyberware), page 2 = background & equipment (spells, deck, gear, vehicles, contacts, details).
@@ -99,7 +101,7 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 - Dark terminal theme (#060c09 bg, #00ffcc neon, Courier) to match the web app's SR aesthetic.
 - FASA watermark footer with character code for traceability.
 
-**Next:** backlog items or v2 planning. See Backlog section below.
+**Next:** physical adept powers, or v2 planning.
 
 ## Risks & mitigations
 - **OCR quality on a 71MB scanned PDF**: mitigated by 400dpi, `--psm 1`, and per-section manual review. Tables (priority, gear, spells) are highest risk; budget hand-transcription time for those.

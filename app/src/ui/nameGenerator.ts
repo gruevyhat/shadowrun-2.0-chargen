@@ -39,6 +39,7 @@ const ARCHETYPE_THEME: Record<ArchetypeId, 'combat' | 'magic' | 'tech' | 'social
   former_wage_mage:   'magic',
   gang_member:        'combat',
   mercenary:          'combat',
+  physical_adept:     'combat',
   rigger:             'tech',
   shaman:             'magic',
   street_mage:        'magic',

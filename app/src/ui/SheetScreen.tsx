@@ -8,22 +8,26 @@ import { generateAdditionalDetails } from './additionalDetailsGenerator';
 import { generatePrograms } from './programsGenerator';
 import { serializeCode, decodeAxes } from './characterCode';
 import { CharacterPdf, buildPdfData, buildMarkdown, pdf } from './CharacterPdf';
+import { augmentAttributes } from '../engine/augmentations';
+import { resolveWeaponDamage } from '../engine/damageCodes';
 import type { ArchetypeId, MagicDisposition } from '../engine/types';
-import skillsData    from '../../../data/sr2/skills.json';
-import gearData      from '../../../data/sr2/gear.json';
-import cyberwareData from '../../../data/sr2/cyberware.json';
-import spellsData    from '../../../data/sr2/spells.json';
-import archetypesData from '../../../data/sr2/archetypes.json';
-import metatypesData  from '../../../data/sr2/metatypes.json';
+import skillsData       from '../../../data/sr2/skills.json';
+import gearData         from '../../../data/sr2/gear.json';
+import cyberwareData    from '../../../data/sr2/cyberware.json';
+import spellsData       from '../../../data/sr2/spells.json';
+import adeptPowersData  from '../../../data/sr2/adept_powers.json';
+import archetypesData   from '../../../data/sr2/archetypes.json';
+import metatypesData    from '../../../data/sr2/metatypes.json';
 
 // ── Lookup maps ───────────────────────────────────────────────────────────
 
-const skillMap    = Object.fromEntries(skillsData.skills.map(s => [s.id, s.name]));
-const gearMap     = Object.fromEntries(gearData.gear.map(g => [g.id, g]));
-const cyberMap    = Object.fromEntries(cyberwareData.cyberware.map(c => [c.id, c]));
-const spellMap    = Object.fromEntries(spellsData.spells.map(s => [s.id, s]));
-const archetypeMap = Object.fromEntries(archetypesData.archetypes.map(a => [a.id, a.name]));
-const metatypeMap  = Object.fromEntries(metatypesData.metatypes.map(m => [m.id, m]));
+const skillMap      = Object.fromEntries(skillsData.skills.map(s => [s.id, s.name]));
+const gearMap       = Object.fromEntries(gearData.gear.map(g => [g.id, g]));
+const cyberMap      = Object.fromEntries(cyberwareData.cyberware.map(c => [c.id, c]));
+const spellMap      = Object.fromEntries(spellsData.spells.map(s => [s.id, s]));
+const adeptPowerMap = Object.fromEntries(adeptPowersData.adeptPowers.map(p => [p.id, p]));
+const archetypeMap  = Object.fromEntries(archetypesData.archetypes.map(a => [a.id, a.name]));
+const metatypeMap   = Object.fromEntries(metatypesData.metatypes.map(m => [m.id, m]));
 
 const WEAPON_CATEGORIES = new Set([
   'pistol', 'smg', 'rifle', 'lmg', 'shotgun', 'meleeWeapon', 'projectileWeapon', 'explosive',
@@ -38,6 +42,7 @@ const ALL_ARCHETYPES: { id: ArchetypeId; magic: MagicDisposition }[] = [
   { id: 'former_wage_mage',   magic: 'full_magic' },
   { id: 'gang_member',        magic: 'mundane'    },
   { id: 'mercenary',          magic: 'mundane'    },
+  { id: 'physical_adept',     magic: 'adept'      },
   { id: 'rigger',             magic: 'mundane'    },
   { id: 'shaman',             magic: 'full_magic' },
   { id: 'street_mage',        magic: 'full_magic' },
@@ -167,11 +172,6 @@ const SEVERITY = ['L', 'M', 'S', 'D'] as const;
 const SEVERITY_PENALTY = ['−1 die', '−2 dice', '−3 dice', 'Incapacitated'] as const;
 function severityOf(i: number) { return i < 3 ? 0 : i < 6 ? 1 : i < 9 ? 2 : 3; }
 
-const WIRED_BONUS: Record<string, [number, number]> = {
-  wired_reflexes_1: [2, 1],
-  wired_reflexes_2: [4, 2],
-  wired_reflexes_3: [6, 3],
-};
 
 function hexColorClass(val: number): string {
   if (val <= 2) return ' attr-hex-val-low';
@@ -216,7 +216,9 @@ function Section({ label, children }: SectionProps) {
 export function SheetScreen() {
   const { state, dispatch } = useApp();
   const [copied, setCopied] = useState(false);
-  const activeSeed = state.screen.tag === 'sheet' ? state.screen.character.intent.seed : -1;
+  const screenState = state.screen.tag === 'sheet' ? state.screen : null;
+  const identityOverrides = screenState?.identityOverrides ?? null;
+  const activeSeed = screenState?.character.intent.seed ?? -1;
   const [trackedSeed, setTrackedSeed]   = useState(activeSeed);
   const [physHit,     setPhysHit]       = useState<Set<number>>(new Set());
   const [stunHit,     setStunHit]       = useState<Set<number>>(new Set());
@@ -238,10 +240,27 @@ export function SheetScreen() {
   // ── Derived values ────────────────────────────────────────────────────
 
   const demographics  = generateDemographics(intent.seed, metatype, intent.archetype);
-  const runnerName    = generateName(intent.seed, intent.archetype, metatype, demographics.sex, demographics.origin);
-  const totalContacts = 2 + (loadout.purchasedContactCount ?? 0);
-  const contacts      = generateContacts(intent.seed, intent.archetype, totalContacts);
-  const details       = generateAdditionalDetails(intent.seed, intent.archetype, metatype, intent.magicDisposition, demographics, runnerName);
+  const baseRunnerName = generateName(intent.seed, intent.archetype, metatype, demographics.sex, demographics.origin);
+  const runnerName     = identityOverrides?.runnerName ?? baseRunnerName;
+  const totalContacts  = 2 + (loadout.purchasedContactCount ?? 0);
+  const baseContacts   = generateContacts(intent.seed, intent.archetype, totalContacts);
+  const contacts       = identityOverrides?.contacts ?? baseContacts;
+  const baseDetails    = generateAdditionalDetails(intent.seed, intent.archetype, metatype, intent.magicDisposition, demographics, baseRunnerName);
+  const details = identityOverrides
+    ? {
+        ...baseDetails,
+        realName:       identityOverrides.realName       ?? baseDetails.realName,
+        pastProfession: identityOverrides.pastProfession ?? baseDetails.pastProfession,
+        personality:    identityOverrides.personality    ?? baseDetails.personality,
+        moralCode:      identityOverrides.moralCode      ?? baseDetails.moralCode,
+        goals:          identityOverrides.goals          ?? baseDetails.goals,
+        lovesHates:     identityOverrides.lovesHates     ?? baseDetails.lovesHates,
+        languages:      identityOverrides.languages
+                          ? identityOverrides.languages.split(',').map(l => l.trim()).filter(Boolean)
+                          : baseDetails.languages,
+        background:     identityOverrides.background     ?? baseDetails.background,
+      }
+    : baseDetails;
 
   // Programs: generated per-deck for deckers
   type DeckData = {
@@ -270,16 +289,9 @@ export function SheetScreen() {
     isMetahuman: boolean;
   } | undefined;
 
-  // Initiative
-  let initReactionBonus = 0;
-  let initExtraDice     = 0;
-  for (const cw of loadout.cyberware) {
-    const bonus = WIRED_BONUS[cw.cyberwareId];
-    if (bonus) { initReactionBonus += bonus[0]; initExtraDice += bonus[1]; }
-  }
-  const initBase  = a.reaction + initReactionBonus;
-  const initDice  = `${1 + initExtraDice}D6`;
-  const initLabel = `${initBase} + ${initDice}`;
+  // Augmented attributes (cyberware + adept power bonuses applied)
+  const aug = augmentAttributes(a, loadout.cyberware, loadout.adeptPowers);
+  const initLabel = `${aug.reactionAug} + ${aug.initiativeDice}D6`;
 
   // Dice pools
   const combatPool = Math.floor((a.quickness + a.intelligence + a.willpower) / 2);
@@ -310,6 +322,12 @@ export function SheetScreen() {
   type SpellData = { name: string; type?: string; drainCode?: string; target?: string; category: string };
   const allSpells = loadout.spells
     .map(sp => ({ item: sp, data: spellMap[sp.spellId] as SpellData | undefined }))
+    .filter(({ data }) => data != null);
+
+  // Adept powers
+  type AdeptPowerData = { name: string; category: string; effect: string; magicCost: number };
+  const allAdeptPowers = (loadout.adeptPowers ?? [])
+    .map(ap => ({ item: ap, data: adeptPowerMap[ap.powerId] as AdeptPowerData | undefined }))
     .filter(({ data }) => data != null);
 
   // Armor
@@ -416,16 +434,17 @@ export function SheetScreen() {
 
   // ── Render ──────────────────────────────────────────────────────────────
 
-  const ATTRS: [string, string, number][] = [
-    ['BOD', 'Body',         a.body],
-    ['QCK', 'Quickness',    a.quickness],
-    ['STR', 'Strength',     a.strength],
-    ['CHA', 'Charisma',     a.charisma],
-    ['INT', 'Intelligence', a.intelligence],
-    ['WIL', 'Willpower',    a.willpower],
-    ['ESS', 'Essence',      a.essence],
-    ['MAG', 'Magic',        a.magic],
-    ['REA', 'Reaction',     a.reaction],
+  // [abbr, label, base, augmented (if different)]
+  const ATTRS: [string, string, number, number?][] = [
+    ['BOD', 'Body',         a.body,         aug.bodyAug      !== a.body      ? aug.bodyAug      : undefined],
+    ['QCK', 'Quickness',    a.quickness,    aug.quicknessAug !== a.quickness ? aug.quicknessAug : undefined],
+    ['STR', 'Strength',     a.strength,     aug.strengthAug  !== a.strength  ? aug.strengthAug  : undefined],
+    ['CHA', 'Charisma',     a.charisma,     undefined],
+    ['INT', 'Intelligence', a.intelligence, undefined],
+    ['WIL', 'Willpower',    a.willpower,    undefined],
+    ['ESS', 'Essence',      a.essence,      undefined],
+    ['MAG', 'Magic',        a.magic,        undefined],
+    ['REA', 'Reaction',     a.reaction,     aug.reactionAug  !== a.reaction  ? aug.reactionAug  : undefined],
   ];
 
   return (
@@ -459,15 +478,16 @@ export function SheetScreen() {
       {/* ── Hex Attribute Row ── */}
       <div className="attr-hex-bar">
         <div className="attr-hex-row">
-          {ATTRS.map(([abbr, , val]) => {
+          {ATTRS.map(([abbr, , val, augVal]) => {
             const display    = !Number.isInteger(val) ? val.toFixed(1) : String(val);
             const dim        = abbr === 'MAG' && intent.magicDisposition === 'mundane';
-            const colorClass = dim ? '' : hexColorClass(val);
+            const colorClass = dim ? '' : hexColorClass(augVal ?? val);
             return (
               <div key={abbr} className={`attr-hex${dim ? ' attr-hex-dim' : ''}${colorClass}`}>
                 <div className="hex-outer">
-                  <div className="hex-inner">
+                  <div className={`hex-inner${augVal != null ? ' has-aug' : ''}`}>
                     <span className="hex-value">{display}</span>
+                    {augVal != null && <span className="hex-aug">({augVal})</span>}
                   </div>
                 </div>
                 <span className="hex-label">{abbr}</span>
@@ -606,10 +626,11 @@ export function SheetScreen() {
               {weapons.map(({ item, data }) => {
                 const d = data!;
                 const ranges = d.ranges ? d.ranges.join('/') : '—';
+                const dmg    = d.damageCode ? resolveWeaponDamage(d.damageCode, aug) : '—';
                 return (
                   <tr key={item.gearId}>
                     <td>{d.name}</td>
-                    <td className="combat-stat">{d.damageCode ?? '—'}</td>
+                    <td className="combat-stat">{dmg}</td>
                     <td className="combat-stat">{d.fireMode ?? '—'}</td>
                     <td className="combat-stat">{d.ammoCapacity ?? '—'}</td>
                     <td className="combat-stat">{d.concealability ?? '—'}</td>
@@ -643,6 +664,33 @@ export function SheetScreen() {
                     <td className="combat-stat">{item.force}</td>
                     <td className="combat-stat">{d.drainCode ?? '—'}</td>
                     <td className="combat-stat combat-target">{d.target ?? '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </Section>
+      )}
+
+      {/* ── Adept Powers (full width, gated) ── */}
+      {allAdeptPowers.length > 0 && (
+        <Section label="ADEPT POWERS">
+          <table className="combat-table">
+            <thead>
+              <tr>
+                <th>Power</th><th>Category</th><th>Cost</th><th>Effect</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allAdeptPowers.map(({ item, data }) => {
+                const d = data!;
+                const cat = d.category.charAt(0).toUpperCase() + d.category.slice(1);
+                return (
+                  <tr key={item.powerId}>
+                    <td>{d.name}</td>
+                    <td className="combat-stat">{cat}</td>
+                    <td className="combat-stat">{item.magicCost}</td>
+                    <td>{d.effect}</td>
                   </tr>
                 );
               })}

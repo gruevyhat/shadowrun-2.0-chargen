@@ -1,11 +1,26 @@
 import { createContext, useContext, useReducer } from 'react';
 import type { Character } from '../engine/types';
 import type { QuizAnswers } from '../quiz/score';
+import type { Contact } from './contactsGenerator';
+
+export interface IdentityOverrides {
+  runnerName?:     string;
+  realName?:       string;
+  pastProfession?: string;
+  personality?:    string;
+  moralCode?:      string;
+  goals?:          string;
+  lovesHates?:     string;
+  languages?:      string;
+  appearance?:     string;
+  background?:     string;
+  contacts?:       Contact[];
+}
 
 export type Screen =
   | { tag: 'landing' }
   | { tag: 'quiz' }
-  | { tag: 'sheet'; character: Character }
+  | { tag: 'sheet'; character: Character; identityOverrides?: IdentityOverrides }
 
 export interface AppState {
   screen: Screen;
@@ -16,7 +31,7 @@ export type AppAction =
   | { type: 'GO_LANDING' }
   | { type: 'GO_QUIZ' }
   | { type: 'ANSWER_QUESTION'; questionId: string; choiceIdx: 0 | 1 }
-  | { type: 'SHOW_CHARACTER'; character: Character }
+  | { type: 'SHOW_CHARACTER'; character: Character; identityOverrides?: IdentityOverrides }
   | { type: 'REROLL_CHARACTER'; character: Character }
 
 export const initialState: AppState = {
@@ -36,8 +51,9 @@ export function reducer(state: AppState, action: AppAction): AppState {
         quizAnswers: { ...state.quizAnswers, [action.questionId]: action.choiceIdx },
       };
     case 'SHOW_CHARACTER':
+      return { ...state, screen: { tag: 'sheet', character: action.character, identityOverrides: action.identityOverrides } };
     case 'REROLL_CHARACTER':
-      return { ...state, screen: { tag: 'sheet', character: action.character } };
+      return { ...state, screen: { tag: 'sheet', character: action.character, identityOverrides: (state.screen as Extract<Screen, { tag: 'sheet' }>).identityOverrides } };
   }
 }
 

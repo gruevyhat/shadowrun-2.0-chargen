@@ -57,6 +57,7 @@ const ARCHETYPE_STYLE: Record<ArchetypeId, string[]> = {
   former_wage_mage:   ['formal but frayed, hermetic seals stitched into the lapels',         'carries a focus like other people carry weapons'],
   gang_member:        ['gang colours, street ink, posture that owns the block',              'lean and fast-looking, everything about them says local'],
   mercenary:          ['military bearing worn loose, gear chosen for function over flash',   'eyes that read terrain before people — a professional habit'],
+  physical_adept:     ['moves like something predatory even standing still',                 'no chrome, no visible augmentation — all of it is inside'],
   rigger:             ['grease-stained and wired, tools on the belt',                        'goggle marks around the eyes, smells faintly of engine'],
   shaman:             ['bone fetishes and hand-stitched leathers, paint on the cheekbones', 'spirit-touched calm, eyes focused somewhere else'],
   street_mage:        ['street clothes layered over ritual kit',                             'focus hidden in plain sight, mana-sight gives the eyes a distant quality'],

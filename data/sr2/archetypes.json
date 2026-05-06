@@ -4,155 +4,585 @@
       "id": "bodyguard",
       "name": "Bodyguard",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human", "ork"],
-      "priorityBias": { "race": 0, "magic": 0, "attributes": 4, "skills": 2, "resources": 5 },
-      "attributeWeights": { "body": 9, "quickness": 9, "strength": 7, "charisma": 3, "intelligence": 5, "willpower": 5 },
-      "coreSkills": ["firearms", "unarmed_combat", "car", "negotiation", "stealth"],
-      "gearTags": ["pistol", "armor", "other"],
+      "preferredMetatypes": [
+        "human",
+        "ork"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 0,
+        "attributes": 4,
+        "skills": 2,
+        "resources": 5
+      },
+      "attributeWeights": {
+        "body": 9,
+        "quickness": 9,
+        "strength": 7,
+        "charisma": 3,
+        "intelligence": 5,
+        "willpower": 5
+      },
+      "coreSkills": [
+        "firearms",
+        "unarmed_combat",
+        "car",
+        "negotiation",
+        "stealth"
+      ],
+      "gearTags": [
+        "pistol",
+        "armor",
+        "other"
+      ],
       "notes": "Heavy combat professional. WR2 + dermal plating + skillwires + High Lifestyle demand Priority A resources. Body/Quickness both 6. Canonical: p.51."
     },
     {
       "id": "combat_mage",
       "name": "Combat Mage",
       "magicDisposition": "full_magic",
-      "preferredMetatypes": ["human"],
-      "priorityBias": { "race": 0, "magic": 5, "attributes": 4, "skills": 2, "resources": 2 },
-      "attributeWeights": { "body": 2, "quickness": 4, "strength": 1, "charisma": 2, "intelligence": 7, "willpower": 9 },
-      "coreSkills": ["sorcery", "conjuring", "magical_theory", "firearms", "unarmed_combat"],
-      "gearTags": ["armor", "other"],
+      "preferredMetatypes": [
+        "human"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 5,
+        "attributes": 4,
+        "skills": 2,
+        "resources": 2
+      },
+      "attributeWeights": {
+        "body": 2,
+        "quickness": 4,
+        "strength": 1,
+        "charisma": 2,
+        "intelligence": 7,
+        "willpower": 9
+      },
+      "coreSkills": [
+        "sorcery",
+        "conjuring",
+        "magical_theory",
+        "firearms",
+        "unarmed_combat"
+      ],
+      "gearTags": [
+        "smg",
+        "armor",
+        "other"
+      ],
       "notes": "Hermetic mage focused on combat spells. Magic A (human). High Willpower for drain. Cybereyes acceptable. Canonical: p.52."
     },
     {
       "id": "decker",
       "name": "Decker",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human", "elf"],
-      "priorityBias": { "race": 2, "magic": 0, "attributes": 2, "skills": 4, "resources": 5 },
-      "attributeWeights": { "body": 2, "quickness": 4, "strength": 2, "charisma": 3, "intelligence": 9, "willpower": 4 },
-      "coreSkills": ["computer", "electronics", "computer_theory", "firearms", "bike"],
-      "gearTags": ["cyberdeck", "electronics", "other"],
+      "preferredMetatypes": [
+        "human",
+        "elf"
+      ],
+      "priorityBias": {
+        "race": 2,
+        "magic": 0,
+        "attributes": 2,
+        "skills": 4,
+        "resources": 5
+      },
+      "attributeWeights": {
+        "body": 2,
+        "quickness": 4,
+        "strength": 2,
+        "charisma": 3,
+        "intelligence": 9,
+        "willpower": 4
+      },
+      "coreSkills": [
+        "computer",
+        "electronics",
+        "computer_theory",
+        "firearms",
+        "bike"
+      ],
+      "gearTags": [
+        "cyberdeck",
+        "electronics",
+        "other"
+      ],
       "notes": "Matrix specialist. Fuchi Cyber-4 and programs demand high resources. Datajack essential. Elf variant also canonical. Canonical: p.53, p.56."
     },
     {
       "id": "detective",
       "name": "Detective",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human"],
-      "priorityBias": { "race": 0, "magic": 0, "attributes": 3, "skills": 5, "resources": 1 },
-      "attributeWeights": { "body": 4, "quickness": 5, "strength": 3, "charisma": 4, "intelligence": 9, "willpower": 5 },
-      "coreSkills": ["firearms", "unarmed_combat", "negotiation", "stealth", "etiquette", "computer"],
-      "gearTags": ["pistol", "other"],
-      "notes": "No cyberware. 6 contacts. Broad skill set for investigation — firearms 6, unarmed 6, negotiation 6, stealth 5. Intelligence 6. Canonical: p.54."
+      "preferredMetatypes": [
+        "human"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 0,
+        "attributes": 3,
+        "skills": 5,
+        "resources": 1
+      },
+      "attributeWeights": {
+        "body": 4,
+        "quickness": 5,
+        "strength": 3,
+        "charisma": 4,
+        "intelligence": 9,
+        "willpower": 5
+      },
+      "coreSkills": [
+        "firearms",
+        "unarmed_combat",
+        "negotiation",
+        "stealth",
+        "etiquette",
+        "computer"
+      ],
+      "gearTags": [
+        "pistol",
+        "other"
+      ],
+      "notes": "No cyberware. 6 contacts. Broad skill set for investigation \u2014 firearms 6, unarmed 6, negotiation 6, stealth 5. Intelligence 6. Canonical: p.54."
     },
     {
       "id": "former_company_man",
       "name": "Former Company Man",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human"],
-      "priorityBias": { "race": 0, "magic": 0, "attributes": 3, "skills": 3, "resources": 5 },
-      "attributeWeights": { "body": 5, "quickness": 7, "strength": 6, "charisma": 2, "intelligence": 3, "willpower": 3 },
-      "coreSkills": ["firearms", "unarmed_combat", "car", "stealth", "etiquette"],
-      "gearTags": ["pistol", "smg", "armor", "other"],
+      "preferredMetatypes": [
+        "human"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 0,
+        "attributes": 3,
+        "skills": 3,
+        "resources": 5
+      },
+      "attributeWeights": {
+        "body": 6,
+        "quickness": 6,
+        "strength": 6,
+        "charisma": 2,
+        "intelligence": 3,
+        "willpower": 3
+      },
+      "coreSkills": [
+        "firearms",
+        "unarmed_combat",
+        "car",
+        "stealth",
+        "etiquette"
+      ],
+      "gearTags": [
+        "pistol",
+        "smg",
+        "armor",
+        "other"
+      ],
       "notes": "WR2 + Muscle Replacement + Eurocar Westwind + heavy gear demand Priority A resources. Essence 1.3. Canonical: p.57."
     },
     {
       "id": "former_wage_mage",
       "name": "Former Wage Mage",
       "magicDisposition": "full_magic",
-      "preferredMetatypes": ["human"],
-      "priorityBias": { "race": 0, "magic": 5, "attributes": 2, "skills": 4, "resources": 0 },
-      "attributeWeights": { "body": 2, "quickness": 3, "strength": 1, "charisma": 2, "intelligence": 9, "willpower": 6 },
-      "coreSkills": ["sorcery", "conjuring", "magical_theory", "etiquette", "psychology"],
-      "gearTags": ["armor", "other"],
+      "preferredMetatypes": [
+        "human"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 5,
+        "attributes": 2,
+        "skills": 4,
+        "resources": 0
+      },
+      "attributeWeights": {
+        "body": 2,
+        "quickness": 3,
+        "strength": 1,
+        "charisma": 2,
+        "intelligence": 9,
+        "willpower": 6
+      },
+      "coreSkills": [
+        "sorcery",
+        "conjuring",
+        "magical_theory",
+        "etiquette",
+        "psychology"
+      ],
+      "gearTags": [
+        "armor",
+        "other"
+      ],
       "notes": "Full hermetic mage, ex-corp. Magic 6, Intelligence 6. Choose fighter/healer/prowler spell orientation. No cyberware. Canonical: p.58."
     },
     {
       "id": "gang_member",
       "name": "Gang Member",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human", "ork", "troll"],
-      "priorityBias": { "race": 0, "magic": 0, "attributes": 5, "skills": 3, "resources": 1 },
-      "attributeWeights": { "body": 6, "quickness": 8, "strength": 6, "charisma": 8, "intelligence": 4, "willpower": 4 },
-      "coreSkills": ["armed_combat", "firearms", "unarmed_combat", "stealth", "bike", "etiquette"],
-      "gearTags": ["pistol", "meleeWeapon", "armor"],
-      "notes": "Charisma 6 (highest of any archetype) + Body/Quickness/Strength all 5–6. Squatter lifestyle. Hand razors + cybereyes. 4 contacts. Canonical: p.59."
+      "preferredMetatypes": [
+        "human",
+        "ork",
+        "troll"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 0,
+        "attributes": 5,
+        "skills": 3,
+        "resources": 1
+      },
+      "attributeWeights": {
+        "body": 6,
+        "quickness": 8,
+        "strength": 6,
+        "charisma": 8,
+        "intelligence": 4,
+        "willpower": 4
+      },
+      "coreSkills": [
+        "armed_combat",
+        "firearms",
+        "unarmed_combat",
+        "stealth",
+        "bike",
+        "etiquette"
+      ],
+      "gearTags": [
+        "pistol",
+        "meleeWeapon",
+        "armor"
+      ],
+      "notes": "Charisma 6 (highest of any archetype) + Body/Quickness/Strength all 5\u20136. Squatter lifestyle. Hand razors + cybereyes. 4 contacts. Canonical: p.59."
     },
     {
       "id": "mercenary",
       "name": "Mercenary",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human", "dwarf"],
-      "priorityBias": { "race": 2, "magic": 0, "attributes": 3, "skills": 5, "resources": 2 },
-      "attributeWeights": { "body": 7, "quickness": 5, "strength": 7, "charisma": 2, "intelligence": 4, "willpower": 4 },
-      "coreSkills": ["firearms", "armed_combat", "unarmed_combat", "gunnery", "throwing_weapons", "stealth"],
-      "gearTags": ["rifle", "pistol", "armor"],
-      "notes": "Combat specialist. Skills A — armed combat 6, firearms 6, unarmed 6, gunnery 4–5. WR1 (human) or smartlink (dwarf). Canonical: p.55, p.60."
+      "preferredMetatypes": [
+        "human",
+        "dwarf"
+      ],
+      "priorityBias": {
+        "race": 2,
+        "magic": 0,
+        "attributes": 3,
+        "skills": 5,
+        "resources": 2
+      },
+      "attributeWeights": {
+        "body": 7,
+        "quickness": 5,
+        "strength": 7,
+        "charisma": 2,
+        "intelligence": 4,
+        "willpower": 4
+      },
+      "coreSkills": [
+        "firearms",
+        "armed_combat",
+        "unarmed_combat",
+        "gunnery",
+        "throwing_weapons",
+        "stealth"
+      ],
+      "gearTags": [
+        "rifle",
+        "lmg",
+        "pistol",
+        "armor"
+      ],
+      "notes": "Combat specialist. Skills A \u2014 armed combat 6, firearms 6, unarmed 6, gunnery 4\u20135. WR1 (human) or smartlink (dwarf). Canonical: p.55, p.60."
+    },
+    {
+      "id": "physical_adept",
+      "name": "Physical Adept",
+      "magicDisposition": "adept",
+      "preferredMetatypes": [
+        "human",
+        "elf",
+        "ork"
+      ],
+      "priorityBias": {
+        "race": 1,
+        "magic": 3,
+        "attributes": 4,
+        "skills": 2,
+        "resources": 1
+      },
+      "attributeWeights": {
+        "body": 4,
+        "quickness": 5,
+        "strength": 4,
+        "charisma": 2,
+        "intelligence": 3,
+        "willpower": 4
+      },
+      "coreSkills": [
+        "unarmed_combat",
+        "armed_combat",
+        "stealth",
+        "athletics",
+        "dodge"
+      ],
+      "gearTags": [
+        "meleeWeapon",
+        "armor"
+      ],
+      "adeptCorePowers": [
+        [
+          "improved_reflexes_1",
+          "improved_reflexes_2"
+        ],
+        [
+          "killing_hands_m",
+          "killing_hands_s"
+        ],
+        [
+          "combat_sense_1",
+          "combat_sense_2"
+        ]
+      ],
+      "adeptExtraPowers": [
+        "pain_resistance_1",
+        "pain_resistance_2",
+        "penetrating_strike_1",
+        "nerve_strike",
+        "athletics_1",
+        "adept_perception_1",
+        "adrenaline_surge",
+        "improved_strength_1",
+        "improved_quickness_1"
+      ],
+      "notes": "Magic-powered melee combatant. Eschews cyberware to preserve Essence = Magic. Picks Improved Reflexes, Killing Hands, and Combat Sense as core powers."
     },
     {
       "id": "rigger",
       "name": "Rigger",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human", "dwarf"],
-      "priorityBias": { "race": 0, "magic": 0, "attributes": 3, "skills": 2, "resources": 5 },
-      "attributeWeights": { "body": 4, "quickness": 6, "strength": 3, "charisma": 3, "intelligence": 9, "willpower": 5 },
-      "coreSkills": ["car", "gunnery", "electronics", "computer", "bike"],
-      "gearTags": ["vehicle", "electronics", "other"],
+      "preferredMetatypes": [
+        "human",
+        "dwarf"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 0,
+        "attributes": 3,
+        "skills": 2,
+        "resources": 5
+      },
+      "attributeWeights": {
+        "body": 4,
+        "quickness": 7,
+        "strength": 3,
+        "charisma": 4,
+        "intelligence": 8,
+        "willpower": 5
+      },
+      "coreSkills": [
+        "car",
+        "gunnery",
+        "electronics",
+        "computer",
+        "bike"
+      ],
+      "gearTags": [
+        "vehicle",
+        "electronics",
+        "other"
+      ],
       "notes": "VCR2 + multiple vehicles demand Priority A resources. Intelligence 6. Essence 1.35. Canonical: p.61."
     },
     {
       "id": "shaman",
       "name": "Shaman",
       "magicDisposition": "full_magic",
-      "preferredMetatypes": ["human", "elf", "ork"],
-      "priorityBias": { "race": 0, "magic": 5, "attributes": 3, "skills": 3, "resources": 0 },
-      "attributeWeights": { "body": 2, "quickness": 3, "strength": 2, "charisma": 7, "intelligence": 4, "willpower": 9 },
-      "coreSkills": ["conjuring", "sorcery", "magical_theory", "etiquette", "stealth", "armed_combat"],
-      "gearTags": ["meleeWeapon", "other"],
+      "preferredMetatypes": [
+        "human",
+        "elf",
+        "ork"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 5,
+        "attributes": 3,
+        "skills": 3,
+        "resources": 0
+      },
+      "attributeWeights": {
+        "body": 2,
+        "quickness": 3,
+        "strength": 2,
+        "charisma": 7,
+        "intelligence": 4,
+        "willpower": 9
+      },
+      "coreSkills": [
+        "conjuring",
+        "sorcery",
+        "magical_theory",
+        "etiquette",
+        "stealth",
+        "armed_combat"
+      ],
+      "gearTags": [
+        "meleeWeapon",
+        "other"
+      ],
       "notes": "Wilderness totem shaman. Magic 6, Willpower 6, Charisma 5. No cyberware. Street lifestyle. Choose fighter/healer/deceiver/detector orientation. Canonical: p.62."
     },
     {
       "id": "street_mage",
       "name": "Street Mage",
       "magicDisposition": "full_magic",
-      "preferredMetatypes": ["human"],
-      "priorityBias": { "race": 0, "magic": 5, "attributes": 2, "skills": 4, "resources": 0 },
-      "attributeWeights": { "body": 2, "quickness": 3, "strength": 1, "charisma": 3, "intelligence": 5, "willpower": 8 },
-      "coreSkills": ["sorcery", "conjuring", "magical_theory", "stealth", "etiquette", "firearms"],
-      "gearTags": ["armor", "other"],
+      "preferredMetatypes": [
+        "human"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 5,
+        "attributes": 2,
+        "skills": 4,
+        "resources": 0
+      },
+      "attributeWeights": {
+        "body": 2,
+        "quickness": 3,
+        "strength": 1,
+        "charisma": 3,
+        "intelligence": 5,
+        "willpower": 8
+      },
+      "coreSkills": [
+        "sorcery",
+        "conjuring",
+        "magical_theory",
+        "stealth",
+        "etiquette",
+        "firearms"
+      ],
+      "gearTags": [
+        "armor",
+        "other"
+      ],
       "notes": "Hermetic mage gone street. Magic 6, Willpower 5, Intelligence 4. Etiquette(Street). No cyberware. Choose fighter/healer/deceiver/detector orientation. Canonical: p.63."
     },
     {
       "id": "street_samurai",
       "name": "Street Samurai",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human", "ork", "troll"],
-      "priorityBias": { "race": 0, "magic": 0, "attributes": 4, "skills": 2, "resources": 5 },
-      "attributeWeights": { "body": 9, "quickness": 6, "strength": 9, "charisma": 1, "intelligence": 5, "willpower": 5 },
-      "coreSkills": ["firearms", "unarmed_combat", "armed_combat", "stealth", "bike", "etiquette"],
-      "gearTags": ["pistol", "smg", "armor", "vehicle"],
+      "preferredMetatypes": [
+        "human",
+        "ork",
+        "troll"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 0,
+        "attributes": 4,
+        "skills": 2,
+        "resources": 5
+      },
+      "attributeWeights": {
+        "body": 9,
+        "quickness": 6,
+        "strength": 9,
+        "charisma": 1,
+        "intelligence": 5,
+        "willpower": 5
+      },
+      "coreSkills": [
+        "firearms",
+        "unarmed_combat",
+        "armed_combat",
+        "stealth",
+        "bike",
+        "etiquette"
+      ],
+      "gearTags": [
+        "pistol",
+        "smg",
+        "armor",
+        "vehicle"
+      ],
       "notes": "Maximum chrome. WR2 + dermal2 + muscle1 + smartlink + DocWagon Platinum demand Priority A resources. Essence 0.1. Canonical: p.64."
     },
     {
       "id": "street_shaman",
       "name": "Street Shaman",
       "magicDisposition": "full_magic",
-      "preferredMetatypes": ["human", "elf"],
-      "priorityBias": { "race": 0, "magic": 5, "attributes": 3, "skills": 3, "resources": 0 },
-      "attributeWeights": { "body": 3, "quickness": 3, "strength": 2, "charisma": 7, "intelligence": 4, "willpower": 9 },
-      "coreSkills": ["conjuring", "sorcery", "magical_theory", "stealth", "etiquette", "firearms"],
-      "gearTags": ["pistol", "other"],
+      "preferredMetatypes": [
+        "human",
+        "elf"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 5,
+        "attributes": 3,
+        "skills": 3,
+        "resources": 0
+      },
+      "attributeWeights": {
+        "body": 3,
+        "quickness": 3,
+        "strength": 2,
+        "charisma": 7,
+        "intelligence": 4,
+        "willpower": 9
+      },
+      "coreSkills": [
+        "conjuring",
+        "sorcery",
+        "magical_theory",
+        "stealth",
+        "etiquette",
+        "firearms"
+      ],
+      "gearTags": [
+        "pistol",
+        "other"
+      ],
       "notes": "Urban totem shaman. Magic 6, Willpower 6, Charisma 5. No cyberware. Choose fighter/healer/deceiver/detector orientation. Canonical: p.65."
     },
     {
       "id": "tribesman",
       "name": "Tribesman",
       "magicDisposition": "mundane",
-      "preferredMetatypes": ["human", "elf"],
-      "priorityBias": { "race": 0, "magic": 0, "attributes": 5, "skills": 4, "resources": 0 },
-      "attributeWeights": { "body": 5, "quickness": 5, "strength": 5, "charisma": 5, "intelligence": 5, "willpower": 5 },
-      "coreSkills": ["projectile_weapons", "stealth", "armed_combat", "athletics", "biotech", "biology"],
-      "gearTags": ["projectileWeapon", "meleeWeapon", "other"],
-      "notes": "All attributes 5 — demands Priority A attributes. Projectile Weapons 6, Stealth 6. No cyberware. Tribal NAN background. Canonical: p.66."
+      "preferredMetatypes": [
+        "human",
+        "elf"
+      ],
+      "priorityBias": {
+        "race": 0,
+        "magic": 0,
+        "attributes": 5,
+        "skills": 4,
+        "resources": 0
+      },
+      "attributeWeights": {
+        "body": 5,
+        "quickness": 5,
+        "strength": 5,
+        "charisma": 5,
+        "intelligence": 5,
+        "willpower": 5
+      },
+      "coreSkills": [
+        "projectile_weapons",
+        "stealth",
+        "armed_combat",
+        "athletics",
+        "biotech",
+        "biology"
+      ],
+      "gearTags": [
+        "projectileWeapon",
+        "meleeWeapon",
+        "other"
+      ],
+      "notes": "All attributes 5 \u2014 demands Priority A attributes. Projectile Weapons 6, Stealth 6. No cyberware. Tribal NAN background. Canonical: p.66."
     }
   ]
 }

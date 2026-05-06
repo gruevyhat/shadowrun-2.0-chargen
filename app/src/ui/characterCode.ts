@@ -13,6 +13,7 @@ const ARCHETYPE_TO_CODE: Record<ArchetypeId, string> = {
   former_wage_mage:   'fwm',
   gang_member:        'gm',
   mercenary:          'merc',
+  physical_adept:     'pa',
   rigger:             'r',
   shaman:             'sh',
   street_mage:        'sm',

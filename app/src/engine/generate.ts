@@ -11,14 +11,27 @@ import gearData             from '../../../data/sr2/gear.json';
 // Maps concentration names that require a specific weapon type to the gear
 // categories that satisfy that requirement.
 const WEAPON_CONC_CATS: Record<string, string[]> = {
-  'Pistols':           ['pistol'],
-  'Rifles':            ['rifle'],
-  'Submachine Guns':   ['smg'],
-  'Light Machine Guns':['lmg'],
-  'Edged Weapons':     ['meleeWeapon'],
-  'Clubs':             ['meleeWeapon'],
-  'Pole Arms/Staff':   ['meleeWeapon'],
-  'Whips/Flails':      ['meleeWeapon'],
+  // firearms
+  'Pistols':                 ['pistol'],
+  'Rifles':                  ['rifle'],
+  'Submachine Guns':         ['smg'],
+  'Light Machine Guns':      ['lmg'],
+  // gunnery (vehicle/heavy weapons — all map to lmg category)
+  'Machine Guns':            ['lmg'],
+  'Assault Cannon':          ['lmg'],
+  'Vehicle-Mounted Cannon':  ['lmg'],
+  // armed combat (melee)
+  'Edged Weapons':           ['meleeWeapon'],
+  'Clubs':                   ['meleeWeapon'],
+  'Pole Arms/Staff':         ['meleeWeapon'],
+  'Whips/Flails':            ['meleeWeapon'],
+  // projectile_weapons
+  'Bows':                    ['projectileWeapon'],
+  'Crossbows':               ['projectileWeapon'],
+  // throwing_weapons (knives/axes live in meleeWeapon category)
+  'Shafted':                 ['meleeWeapon'],
+  'Non-Aerodynamic':         ['meleeWeapon'],
+  'Aerodynamic':             ['meleeWeapon'],
 };
 
 function ownedGearCategories(loadout: Loadout): Set<string> {
@@ -46,7 +59,7 @@ export function generate(intent: CharacterIntent): Character {
   const priorities = assignPriorities(intent, metatype);
   const attributes = spendAttributes(intent, metatype, priorities);
   const rawSkills  = spendSkills(intent, priorities);
-  const loadout    = spendResources(intent, priorities, attributes);
+  const loadout    = spendResources(intent, priorities, attributes, rawSkills);
 
   const essenceCost = loadout.cyberware.reduce((s, cw) => s + cw.essenceCost, 0);
   attributes.essence = Math.max(0, parseFloat((6 - essenceCost).toFixed(2)));

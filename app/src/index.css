@@ -336,8 +336,10 @@ html, body, #root {
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   background: var(--bg-card);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1px;
 }
 
 .hex-value {
@@ -347,11 +349,23 @@ html, body, #root {
   line-height: 1;
 }
 
+/* When augmented value is present, shrink the base value slightly */
+.hex-inner.has-aug .hex-value {
+  font-size: 0.9rem;
+}
+
 .hex-label {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--text);
+}
+
+.hex-aug {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1;
 }
 
 .attr-hex-dim .hex-outer { background: var(--bg); }
@@ -706,22 +720,26 @@ html, body, #root {
 /* 1-2: muted red */
 .attr-hex-val-low .hex-outer  { background: #c41a3e; filter: drop-shadow(0 0 5px rgba(180,30,60,0.45)); }
 .attr-hex-val-low .hex-inner  { background: var(--bg-card); }
-.attr-hex-val-low .hex-value  { color: #e04060; text-shadow: 0 0 5px rgba(200,50,80,0.55); }
+.attr-hex-val-low .hex-value,
+.attr-hex-val-low .hex-aug   { color: #e04060; text-shadow: 0 0 5px rgba(200,50,80,0.55); }
 
 /* 3-4: muted green */
 .attr-hex-val-mid .hex-outer  { background: #00a84a; filter: drop-shadow(0 0 5px rgba(0,160,70,0.45)); }
 .attr-hex-val-mid .hex-inner  { background: var(--bg-card); }
-.attr-hex-val-mid .hex-value  { color: #00cc58; text-shadow: 0 0 5px rgba(0,180,80,0.55); }
+.attr-hex-val-mid .hex-value,
+.attr-hex-val-mid .hex-aug   { color: #00cc58; text-shadow: 0 0 5px rgba(0,180,80,0.55); }
 
 /* 5-6: muted cyan */
 .attr-hex-val-high .hex-outer { background: #0096cc; filter: drop-shadow(0 0 5px rgba(0,150,190,0.45)); }
 .attr-hex-val-high .hex-inner { background: var(--bg-card); }
-.attr-hex-val-high .hex-value { color: #00b8e0; text-shadow: 0 0 5px rgba(0,170,210,0.55); }
+.attr-hex-val-high .hex-value,
+.attr-hex-val-high .hex-aug  { color: #00b8e0; text-shadow: 0 0 5px rgba(0,170,210,0.55); }
 
 /* 7+: muted gold */
 .attr-hex-val-max .hex-outer  { background: #c49800; filter: drop-shadow(0 0 5px rgba(180,140,0,0.45)); }
 .attr-hex-val-max .hex-inner  { background: var(--bg-card); }
-.attr-hex-val-max .hex-value  { color: #e0b800; text-shadow: 0 0 5px rgba(200,160,0,0.55); }
+.attr-hex-val-max .hex-value,
+.attr-hex-val-max .hex-aug   { color: #e0b800; text-shadow: 0 0 5px rgba(200,160,0,0.55); }
 
 /* ── Priority word display ───────────────────────────────────────────────── */
 .attr-hex-priorities {
@@ -951,4 +969,12 @@ html, body, #root {
 @keyframes pulse {
   0%, 100% { opacity: 0.2; }
   50%       { opacity: 1; }
+}
+
+/* ── Markdown import error ─────────────────────────────────────────── */
+.import-error {
+  font-size: 0.7rem;
+  color: #e04060;
+  margin-top: 0.25rem;
+  text-align: right;
 }

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useApp } from './store';
+import type { IdentityOverrides } from './store';
 import { generate } from '../engine/generate';
 import type { ArchetypeId, MagicDisposition } from '../engine/types';
 import { parseCode, encodeAxes } from './characterCode';
+import type { Contact } from './contactsGenerator';
 
 const ARCHETYPES: { id: ArchetypeId; magic: MagicDisposition }[] = [
   { id: 'bodyguard',          magic: 'mundane'    },
@@ -13,6 +15,7 @@ const ARCHETYPES: { id: ArchetypeId; magic: MagicDisposition }[] = [
   { id: 'former_wage_mage',   magic: 'full_magic' },
   { id: 'gang_member',        magic: 'mundane'    },
   { id: 'mercenary',          magic: 'mundane'    },
+  { id: 'physical_adept',     magic: 'adept'      },
   { id: 'rigger',             magic: 'mundane'    },
   { id: 'shaman',             magic: 'full_magic' },
   { id: 'street_mage',        magic: 'full_magic' },
@@ -21,10 +24,58 @@ const ARCHETYPES: { id: ArchetypeId; magic: MagicDisposition }[] = [
   { id: 'tribesman',          magic: 'mundane'    },
 ];
 
+// ── Markdown import helpers ───────────────────────────────────────────────
+
+function extractDetail(md: string, key: string): string | undefined {
+  const re = new RegExp(`\\*\\*${key.replace('/', '\\/')}:\\*\\*\\s*(.+?)(?:  |\\n|$)`, 'm');
+  return md.match(re)?.[1]?.trim() || undefined;
+}
+
+function parseMarkdownImport(md: string): { code: ReturnType<typeof parseCode>; overrides: IdentityOverrides } {
+  const codeMatch = md.match(/Runner ID: `([^`]+)`/);
+  const code = codeMatch ? parseCode(codeMatch[1]) : null;
+
+  const nameMatch = md.match(/^# (.+?) —/m);
+  const runnerName = nameMatch?.[1]?.trim();
+
+  const bgMatch = md.match(/### Background\s*\n+([\s\S]+?)(?:\n+---|\n+## |\n+\*Shadowrun|\n*$)/);
+  const background = bgMatch?.[1]?.trim();
+
+  const contacts: Contact[] = [];
+  const contactSection = md.match(/## Contacts\s*\n([\s\S]+?)(?:\n## |\n---|\n\*Shadowrun|\n*$)/);
+  if (contactSection) {
+    for (const row of contactSection[1].split('\n')) {
+      if (!row.startsWith('|') || row.includes('---') || /name\s*\|/i.test(row)) continue;
+      const cells = row.split('|').map(c => c.trim()).filter(Boolean);
+      if (cells.length >= 4)
+        contacts.push({ name: cells[0], role: cells[1], loyalty: parseInt(cells[2]) || 1, connection: parseInt(cells[3]) || 1 });
+    }
+  }
+
+  return {
+    code,
+    overrides: {
+      runnerName,
+      realName:       extractDetail(md, 'Legal Name'),
+      pastProfession: extractDetail(md, 'Past'),
+      personality:    extractDetail(md, 'Personality'),
+      moralCode:      extractDetail(md, 'Moral Code'),
+      goals:          extractDetail(md, 'Goals'),
+      lovesHates:     extractDetail(md, 'Loves / Hates'),
+      languages:      extractDetail(md, 'Languages'),
+      appearance:     extractDetail(md, 'Appearance'),
+      background,
+      contacts: contacts.length > 0 ? contacts : undefined,
+    },
+  };
+}
+
 export function LandingScreen() {
   const { dispatch } = useApp();
-  const [seedInput, setSeedInput] = useState('');
-  const [seedError, setSeedError] = useState(false);
+  const [seedInput,   setSeedInput]   = useState('');
+  const [seedError,   setSeedError]   = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const mdInputRef = useRef<HTMLInputElement>(null);
 
   function handleRandom() {
     const seed = Math.floor(Math.random() * 0xffffffff);
@@ -51,6 +102,28 @@ export function LandingScreen() {
     if (seedError) setSeedError(false);
   }
 
+  function handleImportMd(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const md = ev.target?.result as string;
+      if (!md) return;
+      const { code, overrides } = parseMarkdownImport(md);
+      if (!code) { setImportError('No valid Runner ID found in file.'); return; }
+      setImportError(null);
+      dispatch({ type: 'SHOW_CHARACTER', character: generate({
+        edition: 'sr2',
+        archetype: code.archetype,
+        magicDisposition: code.magicDisposition,
+        seed: code.seed,
+        ...(code.axisScores ? { axisCode: encodeAxes(code.axisScores) } : {}),
+      }), identityOverrides: overrides });
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
   return (
     <div className="screen landing">
       <div className="landing-header">
@@ -74,6 +147,14 @@ export function LandingScreen() {
             <span className="btn-label">RANDOM RUNNER</span>
             <span className="btn-sub">instant · random archetype · re-rollable</span>
           </button>
+
+          <button className="btn btn-secondary" onClick={() => mdInputRef.current?.click()}>
+            <span className="btn-label">IMPORT CHARACTER</span>
+            <span className="btn-sub">load from exported markdown file</span>
+          </button>
+          <input ref={mdInputRef} type="file" accept=".md,.txt,text/markdown,text/plain"
+            style={{ display: 'none' }} onChange={handleImportMd} />
+          {importError && <span className="seed-load-error-text">{importError}</span>}
 
           <form
             className={`seed-load${seedError ? ' seed-load-error' : ''}`}

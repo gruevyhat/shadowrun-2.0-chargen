@@ -31,6 +31,7 @@ const ARCHETYPE_CONTACTS: Record<ArchetypeId, string[]> = {
   former_wage_mage:   ['Fixer',  'Talismonger',       'Hermetic Scholar',  'Corp Mage Contact',   'Awakened Fence',     'Library Archivist'],
   gang_member:        ['Fixer',  'Gang Leader',       'Street Doc',        'Fence',               'Rival Gang Contact', 'Turf Informant'],
   mercenary:          ['Fixer',  'Arms Dealer',       'Military Contact',  'Merc Broker',         'Street Doc',         'Logistics Specialist'],
+  physical_adept:     ['Fixer',  'Street Sensei',     'Healer',            'Awakened Community',  'Arms Dealer',        'Underground Fighter'],
   rigger:             ['Fixer',  'Chop Shop Owner',   'Parts Dealer',      'Driver Network',      'Drone Supplier',     'Garage Hermit'],
   shaman:             ['Fixer',  'Tribal Elder',      'Healer',            'Nature Guide',        'Spirit Talker',      'Wilderness Contact'],
   street_mage:        ['Fixer',  'Talismonger',       'Street Mage',       'Awakened Community',  'Hermetic Scholar',   'Spirit Talker'],

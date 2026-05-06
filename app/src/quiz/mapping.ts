@@ -44,6 +44,7 @@ const ARCHETYPE_VECTORS: Record<ArchetypeId, AxisVector> = {
   former_wage_mage:     [  0,   4,   2,   2,  -5,   0 ],
   gang_member:          [  3,  -4,  -1,  -3,   4,   2 ],
   mercenary:            [ -3,  -3,  -4,   0,   4,   1 ],
+  physical_adept:       [ -2,  -3,  -3,  -2,  -4,   0 ],  // wild/iron/wired lean, awakened
   rigger:               [ -3,   4,  -2,   3,   4,   1 ],  // iron -2 (tactical, not combat)
   shaman:               [  4,  -3,   3,  -1,  -5,   3 ],  // strong anti-streetwise, strong meta
   street_mage:          [  2,   1,   2,  -2,  -5,   0 ],
@@ -55,10 +56,13 @@ const ARCHETYPE_VECTORS: Record<ArchetypeId, AxisVector> = {
 const FULL_MAGIC_ARCHETYPES = new Set<ArchetypeId>([
   'combat_mage', 'former_wage_mage', 'shaman', 'street_mage', 'street_shaman',
 ]);
+const ADEPT_ARCHETYPES = new Set<ArchetypeId>(['physical_adept']);
 
-// Magic disposition: full_magic for the five magic archetypes, mundane otherwise.
+// Magic disposition: full_magic, adept, or mundane based on archetype.
 function deriveMagicDisposition(_scores: AxisScores, archetype: ArchetypeId): MagicDisposition {
-  return FULL_MAGIC_ARCHETYPES.has(archetype) ? 'full_magic' : 'mundane';
+  if (FULL_MAGIC_ARCHETYPES.has(archetype)) return 'full_magic';
+  if (ADEPT_ARCHETYPES.has(archetype))      return 'adept';
+  return 'mundane';
 }
 
 // Metatype hint: driven by human_metahuman score and archetype preference.

@@ -7,7 +7,7 @@ export type PriorityLevel    = 'A' | 'B' | 'C' | 'D' | 'E';
 export type ArchetypeId =
   | 'bodyguard' | 'combat_mage' | 'decker' | 'detective'
   | 'former_company_man' | 'former_wage_mage' | 'gang_member' | 'mercenary'
-  | 'rigger' | 'shaman' | 'street_mage' | 'street_samurai'
+  | 'physical_adept' | 'rigger' | 'shaman' | 'street_mage' | 'street_samurai'
   | 'street_shaman' | 'tribesman';
 
 export type MetatypeId = 'human' | 'elf' | 'dwarf' | 'ork' | 'troll';
@@ -66,12 +66,19 @@ export interface SpellSelection {
   force:   number;
 }
 
+export interface AdeptPowerSelection {
+  powerId:   string;
+  magicCost: number;
+}
+
 export interface Loadout {
-  cyberware:   CyberwareItem[];
-  gear:        GearItem[];
-  spells:      SpellSelection[];
+  cyberware:    CyberwareItem[];
+  gear:         GearItem[];
+  spells:       SpellSelection[];
+  adeptPowers:  AdeptPowerSelection[];
   remainingNuyen: number;
   remainingForcePoints: number;
+  remainingMagicPoints: number;
   purchasedContactCount: number;
 }
 

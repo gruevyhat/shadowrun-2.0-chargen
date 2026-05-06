@@ -3,10 +3,13 @@ import type { Character, SkillRating } from '../engine/types';
 import type { Demographics } from './demographicsGenerator';
 import type { AdditionalDetails } from './additionalDetailsGenerator';
 import type { Contact } from './contactsGenerator';
-import skillsData    from '../../../data/sr2/skills.json';
-import gearData      from '../../../data/sr2/gear.json';
-import cyberwareData from '../../../data/sr2/cyberware.json';
-import spellsData    from '../../../data/sr2/spells.json';
+import { augmentAttributes } from '../engine/augmentations';
+import { resolveWeaponDamage } from '../engine/damageCodes';
+import skillsData      from '../../../data/sr2/skills.json';
+import gearData        from '../../../data/sr2/gear.json';
+import cyberwareData   from '../../../data/sr2/cyberware.json';
+import spellsData      from '../../../data/sr2/spells.json';
+import adeptPowersData from '../../../data/sr2/adept_powers.json';
 
 export { pdf };
 
@@ -21,7 +24,7 @@ export interface PdfData {
   age:             number;
   origin:          string;
   characterCode:   string;
-  attrs:           Array<{ abbr: string; val: number; isDim: boolean }>;
+  attrs:           Array<{ abbr: string; val: number; augVal?: number; isDim: boolean }>;
   initLabel:       string;
   startingCash:    number;
   karmaPool:       number;
@@ -37,8 +40,9 @@ export interface PdfData {
   weapons:   Array<{ name: string; damageCode?: string; fireMode?: string; ammoCapacity?: number; concealability?: number; ranges?: number[] }>;
   armors:    Array<{ name: string; armorBallistic?: number; armorImpact?: number }>;
   cyberware: Array<{ name: string; essenceCost: number; effect?: string }>;
-  spells:    Array<{ name: string; category: string; typePhy: boolean; force: number; drainCode?: string; target?: string }>;
-  gear:      Array<{ name: string; costNuyen: number }>;
+  spells:      Array<{ name: string; category: string; typePhy: boolean; force: number; drainCode?: string; target?: string }>;
+  adeptPowers: Array<{ name: string; category: string; magicCost: number; effect: string }>;
+  gear:        Array<{ name: string; costNuyen: number }>;
   lifestyle: string | null;
   decks:     Array<{ name: string; mpcp?: number; hardening?: number; activeMb?: number; storageMb?: number; ioSpeed?: number; responseIncrease?: number }>;
   vehicles:  Array<{ name: string; vehHandling?: number; vehSpeed?: number; vehAccel?: number; vehBody?: number; vehArmor?: number; vehSignature?: number; vehPilot?: number; vehSeats?: number }>;
@@ -57,17 +61,13 @@ export interface PdfData {
 
 // ── Builder ───────────────────────────────────────────────────────────────────
 
-const _skillMap    = Object.fromEntries(skillsData.skills.map(s => [s.id, s.name]));
-const _gearMap     = Object.fromEntries(gearData.gear.map(g => [g.id, g]));
-const _cyberMap    = Object.fromEntries(cyberwareData.cyberware.map(c => [c.id, c]));
-const _spellMap    = Object.fromEntries(spellsData.spells.map(s => [s.id, s]));
+const _skillMap      = Object.fromEntries(skillsData.skills.map(s => [s.id, s.name]));
+const _gearMap       = Object.fromEntries(gearData.gear.map(g => [g.id, g]));
+const _cyberMap      = Object.fromEntries(cyberwareData.cyberware.map(c => [c.id, c]));
+const _spellMap      = Object.fromEntries(spellsData.spells.map(s => [s.id, s]));
+const _adeptPowerMap = Object.fromEntries(adeptPowersData.adeptPowers.map(p => [p.id, p]));
 
 const WEAPON_CATS = new Set(['pistol','smg','rifle','lmg','shotgun','meleeWeapon','projectileWeapon','explosive']);
-const WIRED_BONUS: Record<string, [number, number]> = {
-  wired_reflexes_1: [2, 1],
-  wired_reflexes_2: [4, 2],
-  wired_reflexes_3: [6, 3],
-};
 const PRI_LABELS: Record<string, string> = {
   race: 'Race', magic: 'Magic', attributes: 'Attr', skills: 'Skills', resources: 'Res',
 };
@@ -83,28 +83,23 @@ export function buildPdfData(
   const magicLabel   = intent.magicDisposition === 'full_magic' ? 'Awakened'
                      : intent.magicDisposition === 'adept'      ? 'Physical Adept' : 'Mundane';
 
-  // Attributes
+  // Augmented attributes
+  const aug = augmentAttributes(a, loadout.cyberware, loadout.adeptPowers ?? []);
   const isMundane = intent.magicDisposition === 'mundane';
+  const augVal = (base: number, augmented: number) => augmented !== base ? augmented : undefined;
   const attrs: PdfData['attrs'] = [
-    { abbr: 'BOD', val: a.body,         isDim: false },
-    { abbr: 'QCK', val: a.quickness,    isDim: false },
-    { abbr: 'STR', val: a.strength,     isDim: false },
+    { abbr: 'BOD', val: a.body,         augVal: augVal(a.body,      aug.bodyAug),      isDim: false },
+    { abbr: 'QCK', val: a.quickness,    augVal: augVal(a.quickness, aug.quicknessAug), isDim: false },
+    { abbr: 'STR', val: a.strength,     augVal: augVal(a.strength,  aug.strengthAug),  isDim: false },
     { abbr: 'CHA', val: a.charisma,     isDim: false },
     { abbr: 'INT', val: a.intelligence, isDim: false },
     { abbr: 'WIL', val: a.willpower,    isDim: false },
     { abbr: 'ESS', val: a.essence,      isDim: false },
     { abbr: 'MAG', val: a.magic,        isDim: isMundane },
-    { abbr: 'REA', val: a.reaction,     isDim: false },
+    { abbr: 'REA', val: a.reaction,     augVal: augVal(a.reaction,  aug.reactionAug),  isDim: false },
   ];
 
-  // Initiative
-  let initReactionBonus = 0, initExtraDice = 0;
-  for (const cw of loadout.cyberware) {
-    const bonus = WIRED_BONUS[cw.cyberwareId];
-    if (bonus) { initReactionBonus += bonus[0]; initExtraDice += bonus[1]; }
-  }
-  const initBase  = a.reaction + initReactionBonus;
-  const initLabel = `${initBase} + ${1 + initExtraDice}D6`;
+  const initLabel = `${aug.reactionAug} + ${aug.initiativeDice}D6`;
 
   // Dice pools
   const combatPool = Math.floor((a.quickness + a.intelligence + a.willpower) / 2);
@@ -134,12 +129,16 @@ export function buildPdfData(
     };
   });
 
-  // Weapons
+  // Weapons (damage codes resolved against augmented attributes)
   type WeaponData = { name: string; damageCode?: string; fireMode?: string; ammoCapacity?: number; concealability?: number; ranges?: number[]; category: string };
   const weapons = loadout.gear
     .map(g => _gearMap[g.gearId] as WeaponData | undefined)
     .filter((d): d is WeaponData => !!d && WEAPON_CATS.has(d.category))
-    .map(d => ({ name: d.name, damageCode: d.damageCode, fireMode: d.fireMode, ammoCapacity: d.ammoCapacity, concealability: d.concealability, ranges: d.ranges }));
+    .map(d => ({
+      name: d.name,
+      damageCode: d.damageCode ? resolveWeaponDamage(d.damageCode, aug) : undefined,
+      fireMode: d.fireMode, ammoCapacity: d.ammoCapacity, concealability: d.concealability, ranges: d.ranges,
+    }));
 
   // Armor
   type ArmorData = { name: string; armorBallistic?: number; armorImpact?: number; category: string };
@@ -163,6 +162,16 @@ export function buildPdfData(
       return { name: d.name, category: d.category, typePhy: d.type === 'physical', force: sp.force, drainCode: d.drainCode, target: d.target };
     })
     .filter((s): s is NonNullable<typeof s> => s != null);
+
+  // Adept powers
+  type AdeptPowerDef = { name: string; category: string; effect: string; magicCost: number };
+  const adeptPowers = (loadout.adeptPowers ?? [])
+    .map(ap => {
+      const d = _adeptPowerMap[ap.powerId] as AdeptPowerDef | undefined;
+      if (!d) return null;
+      return { name: d.name, category: d.category, magicCost: ap.magicCost, effect: d.effect };
+    })
+    .filter((p): p is NonNullable<typeof p> => p != null);
 
   // Gear (non-weapon, non-armor, non-lifestyle, non-cyberdeck, non-vehicle)
   type GearData = { name: string; category: string; costNuyen?: number };
@@ -226,7 +235,7 @@ export function buildPdfData(
     priorityDisplay,
     combatPool, taskPool, spellPool,
     skills: pdfSkills,
-    weapons, armors, cyberware, spells, gear, lifestyle, decks, vehicles,
+    weapons, armors, cyberware, spells, adeptPowers, gear, lifestyle, decks, vehicles,
     contacts,
     realName:       details.realName,
     pastProfession: details.pastProfession,
@@ -262,7 +271,8 @@ export function buildMarkdown(data: PdfData): string {
   push('|' + data.attrs.map(() => ':---:').join('|') + '|');
   push('| ' + data.attrs.map(a => {
     if (a.isDim) return '—';
-    return Number.isInteger(a.val) ? String(a.val) : a.val.toFixed(1);
+    const base = Number.isInteger(a.val) ? String(a.val) : a.val.toFixed(1);
+    return a.augVal != null ? `${base} (${a.augVal})` : base;
   }).join(' | ') + ' |');
   push('');
   push(`**Initiative:** ${data.initLabel}  ·  **Cash:** ¥${data.startingCash.toLocaleString()}  ·  **Karma Pool:** ${data.karmaPool}  `);
@@ -287,24 +297,26 @@ export function buildMarkdown(data: PdfData): string {
   hr();
 
   // Protection
-  if (data.armors.length > 0) {
-    push('## Protection', '');
-    push('| Armor | B | I |');
-    push('|-------|:---:|:---:|');
+  push('## Protection', '');
+  push('| Armor | B | I |');
+  push('|-------|:---:|:---:|');
+  if (data.armors.length > 0)
     for (const a of data.armors)
       push(`| ${a.name} | ${a.armorBallistic ?? '—'} | ${a.armorImpact ?? '—'} |`);
-    hr();
-  }
+  else
+    push('| — | — | — |');
+  hr();
 
   // Weapons
-  if (data.weapons.length > 0) {
-    push('## Weapons', '');
-    push('| Weapon | Dmg | Mode | Ammo | Conc | Range (S/M/L/E) |');
-    push('|--------|:---:|:----:|:----:|:----:|:---------------:|');
+  push('## Weapons', '');
+  push('| Weapon | Dmg | Mode | Ammo | Conc | Range (S/M/L/E) |');
+  push('|--------|:---:|:----:|:----:|:----:|:---------------:|');
+  if (data.weapons.length > 0)
     for (const w of data.weapons)
       push(`| ${w.name} | ${w.damageCode ?? '—'} | ${w.fireMode ?? '—'} | ${w.ammoCapacity ?? '—'} | ${w.concealability ?? '—'} | ${w.ranges ? w.ranges.join('/') : '—'} |`);
-    hr();
-  }
+  else
+    push('| — | — | — | — | — | — |');
+  hr();
 
   // Skills
   push('## Skills', '');
@@ -318,73 +330,94 @@ export function buildMarkdown(data: PdfData): string {
   hr();
 
   // Cyberware
-  if (data.cyberware.length > 0) {
-    push('## Cyberware', '');
-    push('| Implant | Essence | Effect |');
-    push('|---------|:-------:|--------|');
+  push('## Cyberware', '');
+  push('| Implant | Essence | Effect |');
+  push('|---------|:-------:|--------|');
+  if (data.cyberware.length > 0)
     for (const cw of data.cyberware)
       push(`| ${cw.name} | ${cw.essenceCost.toFixed(1)}E | ${cw.effect ?? '—'} |`);
-    hr();
-  }
+  else
+    push('| — | — | — |');
+  hr();
 
   // Spells
-  if (data.spells.length > 0) {
-    push('## Spells', '');
-    push('| Spell | Category | Type | Force | Drain | Target |');
-    push('|-------|----------|------|:-----:|:-----:|--------|');
+  push('## Spells', '');
+  push('| Spell | Category | Type | Force | Drain | Target |');
+  push('|-------|----------|------|:-----:|:-----:|--------|');
+  if (data.spells.length > 0)
     for (const sp of data.spells) {
       const cat = sp.category.charAt(0).toUpperCase() + sp.category.slice(1);
       push(`| ${sp.name} | ${cat} | ${sp.typePhy ? 'Physical' : 'Mana'} | ${sp.force} | ${sp.drainCode ?? '—'} | ${sp.target ?? '—'} |`);
     }
-    hr();
-  }
+  else
+    push('| — | — | — | — | — | — |');
+  hr();
+
+  // Adept Powers
+  push('## Adept Powers', '');
+  push('| Power | Category | Cost | Effect |');
+  push('|-------|----------|:----:|--------|');
+  if (data.adeptPowers.length > 0)
+    for (const ap of data.adeptPowers) {
+      const cat = ap.category.charAt(0).toUpperCase() + ap.category.slice(1);
+      push(`| ${ap.name} | ${cat} | ${ap.magicCost} | ${ap.effect} |`);
+    }
+  else
+    push('| — | — | — | — |');
+  hr();
 
   // Cyberdeck
-  if (data.decks.length > 0) {
-    push('## Cyberdeck', '');
-    push('| Deck | MPCP | Hardening | Active | Storage | I/O | +Response |');
-    push('|------|:----:|:---------:|:------:|:-------:|:---:|:---------:|');
+  push('## Cyberdeck', '');
+  push('| Deck | MPCP | Hardening | Active | Storage | I/O | +Response |');
+  push('|------|:----:|:---------:|:------:|:-------:|:---:|:---------:|');
+  if (data.decks.length > 0)
     for (const d of data.decks)
       push(`| ${d.name} | ${d.mpcp ?? '—'} | ${d.hardening ?? '—'} | ${d.activeMb != null ? `${d.activeMb}Mb` : '—'} | ${d.storageMb != null ? `${d.storageMb}Mb` : '—'} | ${d.ioSpeed ?? '—'} | +${d.responseIncrease ?? 0} |`);
-    hr();
-  }
+  else
+    push('| — | — | — | — | — | — | — |');
+  hr();
 
   // Equipment
+  push('## Equipment', '');
   if (data.gear.length > 0 || data.lifestyle) {
-    push('## Equipment', '');
     for (const g of data.gear)
       push(`- ${g.name}${g.costNuyen > 0 ? ` (¥${g.costNuyen.toLocaleString()})` : ''}`);
     if (data.lifestyle)
       push(`- **Lifestyle:** ${data.lifestyle}`);
-    hr();
+  } else {
+    push('— ');
   }
+  hr();
 
   // Vehicles
-  if (data.vehicles.length > 0) {
-    push('## Vehicles', '');
-    push('| Vehicle | Hand | Speed | Accel | Body | Armor | Sig | Pilot | Seats |');
-    push('|---------|:----:|:-----:|:-----:|:----:|:-----:|:---:|:-----:|:-----:|');
+  push('## Vehicles', '');
+  push('| Vehicle | Hand | Speed | Accel | Body | Armor | Sig | Pilot | Seats |');
+  push('|---------|:----:|:-----:|:-----:|:----:|:-----:|:---:|:-----:|:-----:|');
+  if (data.vehicles.length > 0)
     for (const v of data.vehicles)
       push(`| ${v.name} | ${v.vehHandling ?? '—'} | ${v.vehSpeed ?? '—'} | ${v.vehAccel ?? '—'} | ${v.vehBody ?? '—'} | ${v.vehArmor ?? '—'} | ${v.vehSignature ?? '—'} | ${v.vehPilot ?? '—'} | ${v.vehSeats ?? '—'} |`);
-    hr();
-  }
+  else
+    push('| — | — | — | — | — | — | — | — | — |');
+  hr();
 
   // Contacts
-  if (data.contacts.length > 0) {
-    push('## Contacts', '');
-    push('| Name | Role | Loyalty | Connection |');
-    push('|------|------|:-------:|:----------:|');
+  push('## Contacts', '');
+  push('| Name | Role | Loyalty | Connection |');
+  push('|------|------|:-------:|:----------:|');
+  if (data.contacts.length > 0)
     for (const c of data.contacts)
       push(`| ${c.name} | ${c.role} | ${c.loyalty} | ${c.connection} |`);
-    hr();
-  }
+  else
+    push('| — | — | — | — |');
+  hr();
 
   // Racial traits
-  if (data.metatypeTraits) {
-    push('## Racial Traits', '');
+  push('## Racial Traits', '');
+  if (data.metatypeTraits)
     push(data.metatypeTraits.replace(/  ·  /g, '  \n'));
-    hr();
-  }
+  else
+    push('None');
+  hr();
 
   // Details
   push('## Additional Details', '');
@@ -650,58 +683,95 @@ function ProtectionPanel({ armors }: { armors: PdfData['armors'] }) {
 }
 
 function WeaponsTable({ weapons }: { weapons: PdfData['weapons'] }) {
-  if (!weapons.length) return null;
   return (
     <View style={{ marginBottom: 8 }}>
       <SecHeader label="WEAPONS" />
       <View style={S.secBody}>
-        <View style={S.tableHead}>
-          <Text style={[S.th, { flex: 1 }]}>WEAPON</Text>
-          <Text style={[S.th, { width: 26, textAlign: 'center' }]}>DMG</Text>
-          <Text style={[S.th, { width: 22, textAlign: 'center' }]}>MODE</Text>
-          <Text style={[S.th, { width: 20, textAlign: 'center' }]}>AMMO</Text>
-          <Text style={[S.th, { width: 18, textAlign: 'center' }]}>CONC</Text>
-          <Text style={[S.th, { width: 56, textAlign: 'center' }]}>S / M / L / E</Text>
-        </View>
-        {weapons.map(w => (
-          <View key={w.name} style={S.tableRow}>
-            <Text style={[S.tdName, { flex: 1 }]}>{w.name}</Text>
-            <Text style={[S.tdStat, { width: 26 }]}>{w.damageCode ?? '—'}</Text>
-            <Text style={[S.tdStat, { width: 22 }]}>{w.fireMode ?? '—'}</Text>
-            <Text style={[S.tdStat, { width: 20 }]}>{w.ammoCapacity ?? '—'}</Text>
-            <Text style={[S.tdStat, { width: 18 }]}>{w.concealability ?? '—'}</Text>
-            <Text style={[S.tdStat, { width: 56 }]}>{w.ranges ? w.ranges.join(' / ') : '—'}</Text>
-          </View>
-        ))}
+        {weapons.length === 0
+          ? <Text style={{ color: C.label, fontSize: 7, fontStyle: 'italic' }}>None</Text>
+          : <>
+            <View style={S.tableHead}>
+              <Text style={[S.th, { flex: 1 }]}>WEAPON</Text>
+              <Text style={[S.th, { width: 26, textAlign: 'center' }]}>DMG</Text>
+              <Text style={[S.th, { width: 22, textAlign: 'center' }]}>MODE</Text>
+              <Text style={[S.th, { width: 20, textAlign: 'center' }]}>AMMO</Text>
+              <Text style={[S.th, { width: 18, textAlign: 'center' }]}>CONC</Text>
+              <Text style={[S.th, { width: 56, textAlign: 'center' }]}>S / M / L / E</Text>
+            </View>
+            {weapons.map(w => (
+              <View key={w.name} style={S.tableRow}>
+                <Text style={[S.tdName, { flex: 1 }]}>{w.name}</Text>
+                <Text style={[S.tdStat, { width: 26 }]}>{w.damageCode ?? '—'}</Text>
+                <Text style={[S.tdStat, { width: 22 }]}>{w.fireMode ?? '—'}</Text>
+                <Text style={[S.tdStat, { width: 20 }]}>{w.ammoCapacity ?? '—'}</Text>
+                <Text style={[S.tdStat, { width: 18 }]}>{w.concealability ?? '—'}</Text>
+                <Text style={[S.tdStat, { width: 56 }]}>{w.ranges ? w.ranges.join(' / ') : '—'}</Text>
+              </View>
+            ))}
+          </>
+        }
       </View>
     </View>
   );
 }
 
 function SpellsTable({ spells }: { spells: PdfData['spells'] }) {
-  if (!spells.length) return null;
   return (
     <View style={{ marginBottom: 8 }}>
       <SecHeader label="SPELLS" />
       <View style={S.secBody}>
-        <View style={S.tableHead}>
-          <Text style={[S.th, { flex: 1 }]}>SPELL</Text>
-          <Text style={[S.th, { width: 38, textAlign: 'center' }]}>CATEGORY</Text>
-          <Text style={[S.th, { width: 24, textAlign: 'center' }]}>TYPE</Text>
-          <Text style={[S.th, { width: 18, textAlign: 'center' }]}>FORCE</Text>
-          <Text style={[S.th, { width: 24, textAlign: 'center' }]}>DRAIN</Text>
-          <Text style={[S.th, { width: 40, textAlign: 'center' }]}>TARGET</Text>
-        </View>
-        {spells.map(sp => (
-          <View key={sp.name} style={S.tableRow}>
-            <Text style={[S.tdName, { flex: 1 }]}>{sp.name}</Text>
-            <Text style={[S.tdStat, { width: 38 }]}>{sp.category.charAt(0).toUpperCase() + sp.category.slice(1)}</Text>
-            <Text style={[S.tdStat, { width: 24 }]}>{sp.typePhy ? 'Physical' : 'Mana'}</Text>
-            <Text style={[S.tdStat, { width: 18 }]}>{sp.force}</Text>
-            <Text style={[S.tdStat, { width: 24 }]}>{sp.drainCode ?? '—'}</Text>
-            <Text style={[S.tdStat, { width: 40 }]}>{sp.target ?? '—'}</Text>
-          </View>
-        ))}
+        {spells.length === 0
+          ? <Text style={{ color: C.label, fontSize: 7, fontStyle: 'italic' }}>None</Text>
+          : <>
+            <View style={S.tableHead}>
+              <Text style={[S.th, { flex: 1 }]}>SPELL</Text>
+              <Text style={[S.th, { width: 38, textAlign: 'center' }]}>CATEGORY</Text>
+              <Text style={[S.th, { width: 24, textAlign: 'center' }]}>TYPE</Text>
+              <Text style={[S.th, { width: 18, textAlign: 'center' }]}>FORCE</Text>
+              <Text style={[S.th, { width: 24, textAlign: 'center' }]}>DRAIN</Text>
+              <Text style={[S.th, { width: 40, textAlign: 'center' }]}>TARGET</Text>
+            </View>
+            {spells.map(sp => (
+              <View key={sp.name} style={S.tableRow}>
+                <Text style={[S.tdName, { flex: 1 }]}>{sp.name}</Text>
+                <Text style={[S.tdStat, { width: 38 }]}>{sp.category.charAt(0).toUpperCase() + sp.category.slice(1)}</Text>
+                <Text style={[S.tdStat, { width: 24 }]}>{sp.typePhy ? 'Physical' : 'Mana'}</Text>
+                <Text style={[S.tdStat, { width: 18 }]}>{sp.force}</Text>
+                <Text style={[S.tdStat, { width: 24 }]}>{sp.drainCode ?? '—'}</Text>
+                <Text style={[S.tdStat, { width: 40 }]}>{sp.target ?? '—'}</Text>
+              </View>
+            ))}
+          </>
+        }
+      </View>
+    </View>
+  );
+}
+
+function AdeptPowersTable({ powers }: { powers: PdfData['adeptPowers'] }) {
+  return (
+    <View style={{ marginBottom: 8 }}>
+      <SecHeader label="ADEPT POWERS" />
+      <View style={S.secBody}>
+        {powers.length === 0
+          ? <Text style={{ color: C.label, fontSize: 7, fontStyle: 'italic' }}>None</Text>
+          : <>
+            <View style={S.tableHead}>
+              <Text style={[S.th, { flex: 1 }]}>POWER</Text>
+              <Text style={[S.th, { width: 40, textAlign: 'center' }]}>CATEGORY</Text>
+              <Text style={[S.th, { width: 22, textAlign: 'center' }]}>COST</Text>
+              <Text style={[S.th, { flex: 1 }]}>EFFECT</Text>
+            </View>
+            {powers.map(ap => (
+              <View key={ap.name} style={S.tableRow}>
+                <Text style={[S.tdName, { flex: 1 }]}>{ap.name}</Text>
+                <Text style={[S.tdStat, { width: 40 }]}>{ap.category.charAt(0).toUpperCase() + ap.category.slice(1)}</Text>
+                <Text style={[S.tdStat, { width: 22 }]}>{ap.magicCost}</Text>
+                <Text style={[S.tdName, { flex: 1 }]}>{ap.effect}</Text>
+              </View>
+            ))}
+          </>
+        }
       </View>
     </View>
   );
@@ -738,7 +808,7 @@ function SkillsList({ skills }: { skills: PdfData['skills'] }) {
 }
 
 function CyberwareList({ cyberware }: { cyberware: PdfData['cyberware'] }) {
-  if (!cyberware.length) return null;
+  if (!cyberware.length) return <Text style={{ color: C.label, fontSize: 7, fontStyle: 'italic' }}>None</Text>;
   return (
     <View>
       {cyberware.map(cw => (
@@ -802,14 +872,18 @@ export function CharacterPdf({ data }: { data: PdfData }) {
 
         {/* Attributes */}
         <View style={S.attrRow}>
-          {attrs.map(({ abbr, val, isDim }) => (
-            <View key={abbr} style={[S.attrBox, isDim ? S.attrBoxDim : {}]}>
-              <Text style={S.attrLabel}>{abbr}</Text>
-              <Text style={[S.attrValue, isDim ? S.attrValueDim : {}]}>
-                {Number.isInteger(val) ? String(val) : val.toFixed(1)}
-              </Text>
-            </View>
-          ))}
+          {attrs.map(({ abbr, val, augVal, isDim }) => {
+            const base = Number.isInteger(val) ? String(val) : val.toFixed(1);
+            return (
+              <View key={abbr} style={[S.attrBox, isDim ? S.attrBoxDim : {}]}>
+                <Text style={S.attrLabel}>{abbr}</Text>
+                <Text style={[S.attrValue, isDim ? S.attrValueDim : {}]}>{base}</Text>
+                {augVal != null && (
+                  <Text style={{ fontSize: 5, color: '#00ffcc', textAlign: 'center' }}>({augVal})</Text>
+                )}
+              </View>
+            );
+          })}
         </View>
 
         {/* Stats bar */}
@@ -856,23 +930,21 @@ export function CharacterPdf({ data }: { data: PdfData }) {
             <SecHeader label="SKILLS" />
             <View style={S.secBody}><SkillsList skills={skills} /></View>
           </View>
-          {cyberware.length > 0 && (
-            <View style={S.colRight}>
-              <SecHeader label="CYBERWARE" />
-              <View style={S.secBody}><CyberwareList cyberware={cyberware} /></View>
-            </View>
-          )}
+          <View style={S.colRight}>
+            <SecHeader label="CYBERWARE" />
+            <View style={S.secBody}><CyberwareList cyberware={cyberware} /></View>
+          </View>
         </View>
 
         {/* Racial traits */}
-        {metatypeTraits && (
-          <View style={{ marginBottom: 8 }}>
-            <SecHeader label="RACIAL TRAITS" />
-            <View style={S.secBody}>
-              <Text style={{ color: C.text, fontSize: 7, lineHeight: 1.4 }}>{metatypeTraits}</Text>
-            </View>
+        <View style={{ marginBottom: 8 }}>
+          <SecHeader label="RACIAL TRAITS" />
+          <View style={S.secBody}>
+            <Text style={{ color: C.text, fontSize: 7, lineHeight: 1.4 }}>
+              {metatypeTraits ?? 'None'}
+            </Text>
           </View>
-        )}
+        </View>
 
         {/* Footer */}
         <View style={S.footer} fixed>
@@ -894,107 +966,122 @@ export function CharacterPdf({ data }: { data: PdfData }) {
         {/* Spells */}
         <SpellsTable spells={spells} />
 
+        {/* Adept Powers */}
+        <AdeptPowersTable powers={data.adeptPowers} />
+
         {/* Cyberdeck */}
-        {decks.length > 0 && (
-          <View style={{ marginBottom: 8 }}>
-            <SecHeader label="CYBERDECK" />
-            <View style={S.secBody}>
-              <View style={S.tableHead}>
-                <Text style={[S.th, { flex: 1 }]}>DECK</Text>
-                <Text style={[S.th, { width: 24, textAlign: 'center' }]}>MPCP</Text>
-                <Text style={[S.th, { width: 24, textAlign: 'center' }]}>HARD</Text>
-                <Text style={[S.th, { width: 36, textAlign: 'center' }]}>ACTIVE</Text>
-                <Text style={[S.th, { width: 36, textAlign: 'center' }]}>STORAGE</Text>
-                <Text style={[S.th, { width: 24, textAlign: 'center' }]}>I/O</Text>
-                <Text style={[S.th, { width: 24, textAlign: 'center' }]}>+RESP</Text>
-              </View>
-              {decks.map(d => (
-                <View key={d.name} style={S.tableRow}>
-                  <Text style={[S.tdName, { flex: 1 }]}>{d.name}</Text>
-                  <Text style={[S.tdStat, { width: 24 }]}>{d.mpcp ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 24 }]}>{d.hardening ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 36 }]}>{d.activeMb != null ? `${d.activeMb}Mb` : '—'}</Text>
-                  <Text style={[S.tdStat, { width: 36 }]}>{d.storageMb != null ? `${d.storageMb}Mb` : '—'}</Text>
-                  <Text style={[S.tdStat, { width: 24 }]}>{d.ioSpeed ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 24 }]}>+{d.responseIncrease ?? 0}</Text>
+        <View style={{ marginBottom: 8 }}>
+          <SecHeader label="CYBERDECK" />
+          <View style={S.secBody}>
+            {decks.length === 0
+              ? <Text style={{ color: C.label, fontSize: 7, fontStyle: 'italic' }}>None</Text>
+              : <>
+                <View style={S.tableHead}>
+                  <Text style={[S.th, { flex: 1 }]}>DECK</Text>
+                  <Text style={[S.th, { width: 24, textAlign: 'center' }]}>MPCP</Text>
+                  <Text style={[S.th, { width: 24, textAlign: 'center' }]}>HARD</Text>
+                  <Text style={[S.th, { width: 36, textAlign: 'center' }]}>ACTIVE</Text>
+                  <Text style={[S.th, { width: 36, textAlign: 'center' }]}>STORAGE</Text>
+                  <Text style={[S.th, { width: 24, textAlign: 'center' }]}>I/O</Text>
+                  <Text style={[S.th, { width: 24, textAlign: 'center' }]}>+RESP</Text>
                 </View>
-              ))}
-            </View>
+                {decks.map(d => (
+                  <View key={d.name} style={S.tableRow}>
+                    <Text style={[S.tdName, { flex: 1 }]}>{d.name}</Text>
+                    <Text style={[S.tdStat, { width: 24 }]}>{d.mpcp ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 24 }]}>{d.hardening ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 36 }]}>{d.activeMb != null ? `${d.activeMb}Mb` : '—'}</Text>
+                    <Text style={[S.tdStat, { width: 36 }]}>{d.storageMb != null ? `${d.storageMb}Mb` : '—'}</Text>
+                    <Text style={[S.tdStat, { width: 24 }]}>{d.ioSpeed ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 24 }]}>+{d.responseIncrease ?? 0}</Text>
+                  </View>
+                ))}
+              </>
+            }
           </View>
-        )}
+        </View>
 
         {/* Equipment */}
-        {(gear.length > 0 || lifestyle) && (
-          <View style={{ marginBottom: 8 }}>
-            <SecHeader label="EQUIPMENT" />
-            <View style={S.secBody}>
-              {gear.map(g => (
-                <View key={g.name} style={S.gearRow}>
-                  <Text style={S.gearName}>{g.name}</Text>
-                  {g.costNuyen > 0 && <Text style={S.gearCost}>¥{g.costNuyen.toLocaleString()}</Text>}
-                </View>
-              ))}
-              {lifestyle && (
-                <View style={S.lifestyleRow}>
-                  <Text style={S.lifestyleLabel}>LIFESTYLE</Text>
-                  <Text style={S.lifestyleValue}>{lifestyle}</Text>
-                </View>
-              )}
-            </View>
+        <View style={{ marginBottom: 8 }}>
+          <SecHeader label="EQUIPMENT" />
+          <View style={S.secBody}>
+            {gear.length === 0 && !lifestyle
+              ? <Text style={{ color: C.label, fontSize: 7, fontStyle: 'italic' }}>None</Text>
+              : <>
+                {gear.map(g => (
+                  <View key={g.name} style={S.gearRow}>
+                    <Text style={S.gearName}>{g.name}</Text>
+                    {g.costNuyen > 0 && <Text style={S.gearCost}>¥{g.costNuyen.toLocaleString()}</Text>}
+                  </View>
+                ))}
+                {lifestyle && (
+                  <View style={S.lifestyleRow}>
+                    <Text style={S.lifestyleLabel}>LIFESTYLE</Text>
+                    <Text style={S.lifestyleValue}>{lifestyle}</Text>
+                  </View>
+                )}
+              </>
+            }
           </View>
-        )}
+        </View>
 
         {/* Vehicles */}
-        {vehicles.length > 0 && (
-          <View style={{ marginBottom: 8 }}>
-            <SecHeader label="VEHICLES" />
-            <View style={S.secBody}>
-              <View style={S.tableHead}>
-                <Text style={[S.th, { flex: 1 }]}>VEHICLE</Text>
-                <Text style={[S.th, { width: 20, textAlign: 'center' }]}>HAND</Text>
-                <Text style={[S.th, { width: 24, textAlign: 'center' }]}>SPEED</Text>
-                <Text style={[S.th, { width: 20, textAlign: 'center' }]}>ACCEL</Text>
-                <Text style={[S.th, { width: 20, textAlign: 'center' }]}>BODY</Text>
-                <Text style={[S.th, { width: 20, textAlign: 'center' }]}>ARM</Text>
-                <Text style={[S.th, { width: 16, textAlign: 'center' }]}>SIG</Text>
-                <Text style={[S.th, { width: 22, textAlign: 'center' }]}>PILOT</Text>
-                <Text style={[S.th, { width: 22, textAlign: 'center' }]}>SEATS</Text>
-              </View>
-              {vehicles.map(v => (
-                <View key={v.name} style={S.tableRow}>
-                  <Text style={[S.tdName, { flex: 1 }]}>{v.name}</Text>
-                  <Text style={[S.tdStat, { width: 20 }]}>{v.vehHandling ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 24 }]}>{v.vehSpeed ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 20 }]}>{v.vehAccel ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 20 }]}>{v.vehBody ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 20 }]}>{v.vehArmor ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 16 }]}>{v.vehSignature ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 22 }]}>{v.vehPilot ?? '—'}</Text>
-                  <Text style={[S.tdStat, { width: 22 }]}>{v.vehSeats ?? '—'}</Text>
+        <View style={{ marginBottom: 8 }}>
+          <SecHeader label="VEHICLES" />
+          <View style={S.secBody}>
+            {vehicles.length === 0
+              ? <Text style={{ color: C.label, fontSize: 7, fontStyle: 'italic' }}>None</Text>
+              : <>
+                <View style={S.tableHead}>
+                  <Text style={[S.th, { flex: 1 }]}>VEHICLE</Text>
+                  <Text style={[S.th, { width: 20, textAlign: 'center' }]}>HAND</Text>
+                  <Text style={[S.th, { width: 24, textAlign: 'center' }]}>SPEED</Text>
+                  <Text style={[S.th, { width: 20, textAlign: 'center' }]}>ACCEL</Text>
+                  <Text style={[S.th, { width: 20, textAlign: 'center' }]}>BODY</Text>
+                  <Text style={[S.th, { width: 20, textAlign: 'center' }]}>ARM</Text>
+                  <Text style={[S.th, { width: 16, textAlign: 'center' }]}>SIG</Text>
+                  <Text style={[S.th, { width: 22, textAlign: 'center' }]}>PILOT</Text>
+                  <Text style={[S.th, { width: 22, textAlign: 'center' }]}>SEATS</Text>
                 </View>
-              ))}
-            </View>
+                {vehicles.map(v => (
+                  <View key={v.name} style={S.tableRow}>
+                    <Text style={[S.tdName, { flex: 1 }]}>{v.name}</Text>
+                    <Text style={[S.tdStat, { width: 20 }]}>{v.vehHandling ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 24 }]}>{v.vehSpeed ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 20 }]}>{v.vehAccel ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 20 }]}>{v.vehBody ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 20 }]}>{v.vehArmor ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 16 }]}>{v.vehSignature ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 22 }]}>{v.vehPilot ?? '—'}</Text>
+                    <Text style={[S.tdStat, { width: 22 }]}>{v.vehSeats ?? '—'}</Text>
+                  </View>
+                ))}
+              </>
+            }
           </View>
-        )}
+        </View>
 
         {/* Contacts */}
         <View style={{ marginBottom: 8 }}>
           <SecHeader label="CONTACTS" />
           <View style={S.secBody}>
-            <View style={S.contactsGrid}>
-              {contacts.map(c => (
-                <View key={c.name} style={S.contactCard}>
-                  <Text style={S.contactName}>{c.name}</Text>
-                  <Text style={S.contactRole}>{c.role}</Text>
-                  <View style={S.contactRats}>
-                    <Text style={S.contactRL}>L </Text>
-                    <Text style={S.contactRV}>{c.loyalty}</Text>
-                    <Text style={S.contactRL}>  C </Text>
-                    <Text style={S.contactRV}>{c.connection}</Text>
-                  </View>
+            {contacts.length === 0
+              ? <Text style={{ color: C.label, fontSize: 7, fontStyle: 'italic' }}>None</Text>
+              : <View style={S.contactsGrid}>
+                  {contacts.map(c => (
+                    <View key={c.name} style={S.contactCard}>
+                      <Text style={S.contactName}>{c.name}</Text>
+                      <Text style={S.contactRole}>{c.role}</Text>
+                      <View style={S.contactRats}>
+                        <Text style={S.contactRL}>L </Text>
+                        <Text style={S.contactRV}>{c.loyalty}</Text>
+                        <Text style={S.contactRL}>  C </Text>
+                        <Text style={S.contactRV}>{c.connection}</Text>
+                      </View>
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </View>
+            }
           </View>
         </View>
 
