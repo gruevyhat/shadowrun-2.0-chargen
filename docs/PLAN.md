@@ -176,7 +176,9 @@ _(v1 backlog cleared 2026-05-05)_
 
 ## Status
 
-**Phase 8 done** (2026-05-06). Manual character builder wizard live. Next: Phase 9 (QoL) or Phase 7 (supplement data).
+**Phase 7 done** (2026-05-06). Grimoire 2e spells added: 35 → 106 spells (combat 32, detection 15, health 12, illusion 16, manipulation 31). All validate against schema; 40 tests pass. Next: Phase 9 (QoL) or Phase 10 (portraits).
+
+**Phase 8 done** (2026-05-06). Manual character builder wizard live.
 
 **v1 complete + v2 plan drafted** (2026-05-05). All v1 milestones done plus:
 - Archetype tuning: `former_company_man` body/quickness/strength weights balanced; `rigger` quickness/intelligence weights equalized; `mercenary` and `combat_mage` gearTags corrected against canonical gear (p.55, p.52, p.60).
