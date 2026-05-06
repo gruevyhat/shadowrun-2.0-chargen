@@ -9,6 +9,7 @@ import { generatePrograms } from './programsGenerator';
 import { serializeCode, decodeAxes } from './characterCode';
 import { CharacterPdf, buildPdfData, buildMarkdown, pdf } from './CharacterPdf';
 import { saveToGallery } from './gallery';
+import { AxisStar } from './AxisStar';
 import { augmentAttributes } from '../engine/augmentations';
 import { resolveWeaponDamage } from '../engine/damageCodes';
 import type { ArchetypeId, MagicDisposition } from '../engine/types';
@@ -1009,6 +1010,14 @@ export function SheetScreen() {
           </div>
         </div>
       </Section>
+
+      {intent.axisCode && (
+        <Section label="AXIS PROFILE">
+          <div className="sheet-axis-star">
+            <AxisStar scores={decodeAxes(intent.axisCode)} />
+          </div>
+        </Section>
+      )}
 
     </div>
   );

@@ -784,6 +784,12 @@ html, body, #root {
   display: block;
 }
 
+.sheet-axis-star {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
 .quiz-generate-btn { margin-top: 0.5rem; width: 100%; max-width: 300px; }
 
 /* ── Hex attribute value colors — muted neon palette ────────────────────── */
