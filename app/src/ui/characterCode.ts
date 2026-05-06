@@ -1,6 +1,13 @@
-import type { ArchetypeId, MagicDisposition } from '../engine/types';
+import type {
+  AdeptPowerSelection, ArchetypeId, AttributeKey, Character, CharacterIntent,
+  CyberwareItem, GearItem, MagicDisposition, MetatypeId,
+  PriorityAssignment, PriorityCategory, PriorityLevel,
+  SkillRating, SpellSelection,
+} from '../engine/types';
+import type { AttributeBlock, Loadout } from '../engine/types';
 import type { AxisScores } from '../quiz/types';
 import { AXIS_ORDER } from '../quiz/mapping';
+import metatypesData from '../../../data/sr2/metatypes.json';
 
 // ── Short-code tables ─────────────────────────────────────────────────────
 
@@ -127,4 +134,143 @@ export function parseCode(input: string): CharacterCode | null {
 
   const axisScores = axisPart ? decodeAxes(axisPart) : undefined;
   return { archetype, magicDisposition, seed, ...(axisScores ? { axisScores } : {}) };
+}
+
+// ── Manual build encode/decode ─────────────────────────────────────────────
+// Format: "m:<base64url(compact-json)>"
+// Compact JSON encodes all mechanical choices so the character can be fully
+// reconstructed from the code without re-running the wizard.
+
+interface ManualCompact {
+  v:   1;
+  a:   string;   // archetype short code
+  mg:  string;   // magic disposition code
+  mt:  MetatypeId;
+  p:   [PriorityLevel, PriorityLevel, PriorityLevel, PriorityLevel, PriorityLevel]; // race,magic,attrs,skills,resources
+  at:  [number, number, number, number, number, number]; // body,quick,str,cha,int,wil
+  sk:  Array<[string, number] | [string, number, string]>; // [id,rating] or [id,rating,conc]
+  cw:  Array<[string, number, number]>; // [id, essenceCost, costNuyen]
+  gr:  Array<[string, number, number]>; // [id, costNuyen, qty]
+  sp:  Array<[string, number]>;         // [id, force]
+  pw:  Array<[string, number]>;         // [id, magicCost]
+  s:   number;
+}
+
+const ATTR_ORDER: AttributeKey[] = ['body', 'quickness', 'strength', 'charisma', 'intelligence', 'willpower'];
+const PRI_ORDER:  PriorityCategory[] = ['race', 'magic', 'attributes', 'skills', 'resources'];
+
+export function encodeManualBuild(params: {
+  archetype:        ArchetypeId;
+  magicDisposition: MagicDisposition;
+  metatype:         MetatypeId;
+  priorities:       PriorityAssignment;
+  attributes:       Record<AttributeKey, number>;
+  skills:           SkillRating[];
+  cyberware:        CyberwareItem[];
+  gear:             GearItem[];
+  spells:           SpellSelection[];
+  adeptPowers:      AdeptPowerSelection[];
+  seed:             number;
+}): string {
+  const compact: ManualCompact = {
+    v:  1,
+    a:  ARCHETYPE_TO_CODE[params.archetype],
+    mg: MAGIC_TO_CODE[params.magicDisposition],
+    mt: params.metatype,
+    p:  PRI_ORDER.map(k => params.priorities[k]) as ManualCompact['p'],
+    at: ATTR_ORDER.map(k => params.attributes[k]) as ManualCompact['at'],
+    sk: params.skills.map(s =>
+      s.concentration
+        ? [s.skillId, s.rating, s.concentration]
+        : [s.skillId, s.rating]
+    ) as ManualCompact['sk'],
+    cw: params.cyberware.map(c => [c.cyberwareId, c.essenceCost, c.costNuyen]),
+    gr: params.gear.map(g => [g.gearId, g.costNuyen, g.quantity]),
+    sp: params.spells.map(s => [s.spellId, s.force]),
+    pw: params.adeptPowers.map(p => [p.powerId, p.magicCost]),
+    s:  params.seed,
+  };
+  const json = JSON.stringify(compact);
+  const b64  = btoa(json).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return `m:${b64}`;
+}
+
+export function decodeManualBuild(input: string): Character | null {
+  if (!input.startsWith('m:')) return null;
+  try {
+    const b64  = input.slice(2).replace(/-/g, '+').replace(/_/g, '/');
+    const json = atob(b64);
+    const c    = JSON.parse(json) as ManualCompact;
+    if (c.v !== 1) return null;
+
+    const archetype        = CODE_TO_ARCHETYPE[c.a];
+    const magicDisposition = CODE_TO_MAGIC[c.mg];
+    if (!archetype || !magicDisposition) return null;
+
+    const priorities: PriorityAssignment = Object.fromEntries(
+      PRI_ORDER.map((k, i) => [k, c.p[i]])
+    ) as PriorityAssignment;
+
+    const baseAttrs = Object.fromEntries(
+      ATTR_ORDER.map((k, i) => [k, c.at[i]])
+    ) as Record<AttributeKey, number>;
+
+    const essenceCost = c.cw.reduce((s, cw) => s + cw[1], 0);
+    const essence     = Math.max(0, parseFloat((6 - essenceCost).toFixed(2)));
+    const magic       = magicDisposition !== 'mundane' ? Math.floor(essence) : 0;
+    const reaction    = Math.floor((baseAttrs.quickness + baseAttrs.intelligence) / 2);
+
+    const attributes: AttributeBlock = { ...baseAttrs, essence, magic, reaction };
+
+    const skills: SkillRating[] = c.sk.map(entry => ({
+      skillId:       entry[0],
+      rating:        entry[1],
+      ...(entry[2] ? { concentration: entry[2] as string } : {}),
+    }));
+
+    const cyberware: CyberwareItem[] = c.cw.map(([cyberwareId, essenceCost, costNuyen]) => ({
+      cyberwareId, essenceCost, costNuyen,
+    }));
+    const gear: GearItem[] = c.gr.map(([gearId, costNuyen, quantity]) => ({
+      gearId, costNuyen, quantity,
+    }));
+    const spells: SpellSelection[]     = c.sp.map(([spellId, force])   => ({ spellId, force }));
+    const adeptPowers: AdeptPowerSelection[] = c.pw.map(([powerId, magicCost]) => ({ powerId, magicCost }));
+
+    const nuyen = (() => {
+      const priData = [1000000, 400000, 90000, 5000, 500]; // A-E
+      const idx = (['A','B','C','D','E'] as PriorityLevel[]).indexOf(priorities.resources);
+      return priData[idx] ?? 0;
+    })();
+    const spent = [...gear.map(g => g.costNuyen * g.quantity), ...cyberware.map(cw => cw.costNuyen)].reduce((a,b) => a+b, 0);
+
+    const loadout: Loadout = {
+      cyberware,
+      gear,
+      spells,
+      adeptPowers,
+      remainingNuyen:        Math.max(0, nuyen - spent),
+      remainingForcePoints:  0,
+      remainingMagicPoints:  0,
+      purchasedContactCount: 0,
+    };
+
+    const metatype = c.mt;
+    const meta = metatypesData.metatypes.find(m => m.id === metatype);
+    const karmaPool   = meta?.isMetahuman ? 2 : 1;
+    const startingCash = Math.floor(loadout.remainingNuyen / 10);
+
+    const intent: CharacterIntent = {
+      edition:          'sr2',
+      archetype,
+      magicDisposition,
+      metatypeHint:     metatype,
+      seed:             c.s,
+      manualCode:       input, // preserve so SheetScreen displays the m: code
+    };
+
+    return { intent, priorities, metatype, attributes, skills, loadout, karmaPool, startingCash };
+  } catch {
+    return null;
+  }
 }

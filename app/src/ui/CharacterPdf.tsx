@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
 import type { Character, SkillRating } from '../engine/types';
 import type { Demographics } from './demographicsGenerator';
@@ -417,7 +418,7 @@ export function buildMarkdown(data: PdfData): string {
   // Racial traits
   push('## Racial Traits', '');
   if (data.metatypeTraits)
-    push(data.metatypeTraits.replace(/  ·  /g, '  \n'));
+    push(data.metatypeTraits.replace(/ {2}· {2}/g, '  \n'));
   else
     push('None');
   hr();

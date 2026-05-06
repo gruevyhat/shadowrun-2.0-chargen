@@ -20,6 +20,7 @@ export interface IdentityOverrides {
 export type Screen =
   | { tag: 'landing' }
   | { tag: 'quiz' }
+  | { tag: 'builder' }
   | { tag: 'sheet'; character: Character; identityOverrides?: IdentityOverrides }
 
 export interface AppState {
@@ -30,6 +31,7 @@ export interface AppState {
 export type AppAction =
   | { type: 'GO_LANDING' }
   | { type: 'GO_QUIZ' }
+  | { type: 'GO_BUILDER' }
   | { type: 'ANSWER_QUESTION'; questionId: string; choiceIdx: 0 | 1 }
   | { type: 'SHOW_CHARACTER'; character: Character; identityOverrides?: IdentityOverrides }
   | { type: 'REROLL_CHARACTER'; character: Character }
@@ -45,6 +47,8 @@ export function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, screen: { tag: 'landing' } };
     case 'GO_QUIZ':
       return { screen: { tag: 'quiz' }, quizAnswers: {} };
+    case 'GO_BUILDER':
+      return { ...state, screen: { tag: 'builder' } };
     case 'ANSWER_QUESTION':
       return {
         ...state,

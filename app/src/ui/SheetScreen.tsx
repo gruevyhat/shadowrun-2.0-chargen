@@ -415,7 +415,7 @@ export function SheetScreen() {
     setVehicleHit({ ...vehicleHit, [gearId]: next });
   }
 
-  const characterCode = serializeCode({
+  const characterCode = intent.manualCode ?? serializeCode({
     archetype:        intent.archetype,
     magicDisposition: intent.magicDisposition,
     seed:             intent.seed,

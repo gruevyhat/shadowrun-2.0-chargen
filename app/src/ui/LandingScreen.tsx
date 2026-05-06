@@ -3,7 +3,7 @@ import { useApp } from './store';
 import type { IdentityOverrides } from './store';
 import { generate } from '../engine/generate';
 import type { ArchetypeId, MagicDisposition } from '../engine/types';
-import { parseCode, encodeAxes } from './characterCode';
+import { parseCode, encodeAxes, decodeManualBuild } from './characterCode';
 import type { Contact } from './contactsGenerator';
 
 const ARCHETYPES: { id: ArchetypeId; magic: MagicDisposition }[] = [
@@ -85,6 +85,14 @@ export function LandingScreen() {
   }
 
   function handleLoad() {
+    // Try manual build first (m: prefix)
+    const trimmed = seedInput.trim();
+    if (trimmed.startsWith('m:')) {
+      const character = decodeManualBuild(trimmed);
+      if (!character) { setSeedError(true); return; }
+      dispatch({ type: 'SHOW_CHARACTER', character });
+      return;
+    }
     const parsed = parseCode(seedInput);
     if (!parsed) { setSeedError(true); return; }
     const character = generate({
@@ -146,6 +154,11 @@ export function LandingScreen() {
           <button className="btn btn-secondary" onClick={handleRandom}>
             <span className="btn-label">RANDOM RUNNER</span>
             <span className="btn-sub">instant · random archetype · re-rollable</span>
+          </button>
+
+          <button className="btn btn-secondary" onClick={() => dispatch({ type: 'GO_BUILDER' })}>
+            <span className="btn-label">BUILD YOUR OWN</span>
+            <span className="btn-sub">step-by-step · full control · rules-valid</span>
           </button>
 
           <button className="btn btn-secondary" onClick={() => mdInputRef.current?.click()}>

@@ -30,6 +30,7 @@ export interface CharacterIntent {
   // Per-section seed overrides set by partial rerolls. Each stage uses
   // seedOverrides[stage] when present, else falls back to childSeed(seed, stage).
   seedOverrides?:   Partial<Record<'attributes' | 'skills' | 'resources', number>>;
+  manualCode?:      string; // m:... code for manually built characters; used by SheetScreen
 }
 
 // ── Pipeline intermediates ────────────────────────────────────────────────────
