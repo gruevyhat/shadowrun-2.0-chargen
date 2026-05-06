@@ -73,6 +73,31 @@ Two parallel tracks:
 - Quiz axis radar chart (dodecagon, six axes, was in v1 plan)
 - SR1 support
 
+### Phase 10 — Character portraits (Grok image generation)
+
+**Goal:** generate a thematic character portrait on the sheet screen and optionally embed it in the PDF export.
+
+**Approach:**
+- Call the [xAI image generation API](https://docs.x.ai/docs/guides/image-understanding) (`grok-2-image` or successor) client-side with a dynamically constructed prompt derived from the character's metatype, archetype, demographics, and appearance description.
+- Portrait prompt template: `"Shadowrun 2050 cyberpunk portrait, [metatype] [sex] [archetype], [appearance excerpt], dark neon aesthetic, detailed illustration"` — constructed from `PdfData` fields already available on the sheet.
+- User supplies their own xAI API key (entered once, stored in `localStorage`; never sent anywhere except xAI). No backend required.
+- Generated image displayed on the sheet screen in a portrait slot; re-generate button allows cycling.
+- PDF export: if a portrait has been generated, embed it on page 1 via `@react-pdf/renderer`'s `<Image>` component (base64 data URL).
+
+**Implementation steps:**
+1. Add an API key input field to the landing screen (or a settings drawer); persist to `localStorage`.
+2. On the sheet screen: "GENERATE PORTRAIT" button triggers a `fetch` to `https://api.x.ai/v1/images/generations` with the constructed prompt, model `grok-2-image`, and the stored key as Bearer token.
+3. Display the returned image URL (or base64) in a portrait frame on the sheet.
+4. Wire the image into `PdfData` and update `CharacterPdf.tsx` to render it in the top-right corner of page 1.
+5. Handle errors gracefully: missing key → prompt to add one; API error → show message, allow retry.
+
+**Constraints:**
+- API key is the user's responsibility; the app makes no server-side calls.
+- Generation is optional — the sheet and PDF work identically without a portrait.
+- Rate limiting / cost is on the user's xAI account.
+
+**Exit criteria:** entering a valid xAI API key and clicking GENERATE PORTRAIT produces a portrait on the sheet; the PDF export includes the portrait when one has been generated; no portrait = no regression in existing PDF output.
+
 ## Phases
 
 ### Phase 0 — Scaffolding (DONE)
