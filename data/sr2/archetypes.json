@@ -341,22 +341,21 @@
           "killing_hands_s"
         ],
         [
-          "combat_sense_1",
-          "combat_sense_2"
+          "combat_sense_1"
         ]
       ],
       "adeptExtraPowers": [
         "pain_resistance_1",
         "pain_resistance_2",
-        "penetrating_strike_1",
-        "nerve_strike",
-        "athletics_1",
-        "adept_perception_1",
-        "adrenaline_surge",
+        "mystic_armor_1",
+        "body_control_1",
+        "missile_parry",
+        "improved_ability_athletic",
+        "improved_physical_senses",
         "improved_strength_1",
         "improved_quickness_1"
       ],
-      "notes": "Magic-powered melee combatant. Eschews cyberware to preserve Essence = Magic. Picks Improved Reflexes, Killing Hands, and Combat Sense as core powers."
+      "notes": "Magic-powered melee combatant. Eschews cyberware to preserve Essence = Magic. Core: Increased Reflexes + Killing Hands + Combat Sense. Sources: SRII p.125-126, Grimoire p.34."
     },
     {
       "id": "rigger",
