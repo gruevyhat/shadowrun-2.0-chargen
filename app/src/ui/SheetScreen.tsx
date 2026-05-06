@@ -314,9 +314,12 @@ export function SheetScreen() {
     name: string; damageCode?: string; concealability?: number; ammoCapacity?: number;
     category: string; fireMode?: string; ranges?: number[]; weightKg?: number;
   };
-  const weapons = loadout.gear
-    .map(g => ({ item: g, data: gearMap[g.gearId] as WeaponData | undefined }))
-    .filter(({ data }) => data && WEAPON_CATEGORIES.has(data.category));
+  const weapons: { item: { gearId: string }; data: WeaponData }[] = [
+    { item: { gearId: '__unarmed__' }, data: { name: 'Unarmed', category: 'meleeWeapon', damageCode: '(Str)M Stun', fireMode: 'Physical' } },
+    ...loadout.gear
+      .map(g => ({ item: g, data: gearMap[g.gearId] as WeaponData | undefined }))
+      .filter((e): e is { item: typeof e.item; data: WeaponData } => !!e.data && WEAPON_CATEGORIES.has(e.data.category)),
+  ];
 
   // Spells
   type SpellData = { name: string; type?: string; drainCode?: string; target?: string; category: string };

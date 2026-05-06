@@ -131,14 +131,17 @@ export function buildPdfData(
 
   // Weapons (damage codes resolved against augmented attributes)
   type WeaponData = { name: string; damageCode?: string; fireMode?: string; ammoCapacity?: number; concealability?: number; ranges?: number[]; category: string };
-  const weapons = loadout.gear
-    .map(g => _gearMap[g.gearId] as WeaponData | undefined)
-    .filter((d): d is WeaponData => !!d && WEAPON_CATS.has(d.category))
-    .map(d => ({
-      name: d.name,
-      damageCode: d.damageCode ? resolveWeaponDamage(d.damageCode, aug) : undefined,
-      fireMode: d.fireMode, ammoCapacity: d.ammoCapacity, concealability: d.concealability, ranges: d.ranges,
-    }));
+  const weapons = [
+    { name: 'Unarmed', damageCode: resolveWeaponDamage('(Str)M Stun', aug), fireMode: 'Physical', ammoCapacity: undefined, concealability: undefined, ranges: undefined },
+    ...loadout.gear
+      .map(g => _gearMap[g.gearId] as WeaponData | undefined)
+      .filter((d): d is WeaponData => !!d && WEAPON_CATS.has(d.category))
+      .map(d => ({
+        name: d.name,
+        damageCode: d.damageCode ? resolveWeaponDamage(d.damageCode, aug) : undefined,
+        fireMode: d.fireMode, ammoCapacity: d.ammoCapacity, concealability: d.concealability, ranges: d.ranges,
+      })),
+  ];
 
   // Armor
   type ArmorData = { name: string; armorBallistic?: number; armorImpact?: number; category: string };
