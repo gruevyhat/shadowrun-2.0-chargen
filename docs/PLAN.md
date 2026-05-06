@@ -9,6 +9,70 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 - Supplements beyond the SR2 core rulebook (backlogged)
 - Account / save-to-cloud features
 
+---
+
+## Goals (v2)
+Two parallel tracks:
+
+1. **Manual character builder** — a third entry point ("BUILD YOUR OWN") where the user drives every allocation decision: priorities A–E, metatype, attribute points, skills, gear. Engine pipeline remains the same; the UI becomes the allocator instead of the generator.
+2. **Supplement data** — expand gear, spells, and adept power accuracy from key SR2 sourcebooks (Grimoire 2e, Street Samurai Catalog completion).
+
+## Non-goals (v2)
+- SR1 support (v3)
+- localStorage saves / character gallery (v3)
+- Share-link encoding (v3)
+- Quiz axis radar chart (v3)
+- Additional sourcebooks beyond Grimoire 2e and Street Samurai Catalog
+
+### Phase 7 — Supplement data (v2, track A)
+
+**Goal:** expand and correct rulebook data from two SR2 sourcebooks.
+
+#### 7a — Grimoire 2e (`docs/SR2/supplements/Shadowrun 2e - Grimoire 2nd edition {FASA7903}.pdf`)
+- OCR targeted pages: adept powers table, expanded spell list, revised conjuring rules.
+- Replace `data/sr2/adept_powers.json` costs/effects with rulebook-verified values (current file sourced from training knowledge — flagged for review).
+- Add any spells in Grimoire not present in core `spells.json`.
+- Update `data/schemas/adept_powers.schema.json` if structure changes.
+
+**Exit criteria:** adept power magic costs match Grimoire 2e page references; all spells validate against schema; 1000-character adept smoke test still passes.
+
+#### 7b — Street Samurai Catalog (`docs/SR2/supplements/Shadowrun 2e - Street Samurai Catalog {FASA7104}.pdf`)
+- Targeted pages: weapons tables, cyberware tables (already partially extracted).
+- Fill gaps in `gear.json` (weapons, armor) and `cyberware.json` against catalog pages.
+- No engine changes expected — data only.
+
+**Exit criteria:** gear and cyberware counts meaningfully increase; all items validate against schema; no regressions in resource-spend smoke test.
+
+### Phase 8 — Manual character builder (v2, track B)
+
+**Goal:** third entry point on the landing screen: "BUILD YOUR OWN" — a step-by-step wizard where the user makes every allocation decision. Fully rules-valid output feeds the same Character Sheet and PDF export.
+
+**Wizard steps (each a discrete screen):**
+
+1. **Priority assignment** — user drags or clicks to assign A–E across the five categories (Metatype, Attributes, Magic, Skills, Resources). Live preview of what each rank grants.
+2. **Metatype selection** — filtered to metatypes available at the chosen Metatype priority. Racial attribute modifiers and special abilities shown.
+3. **Attribute allocation** — point-buy within the priority-determined pool; sliders or +/− controls; racial min/max caps enforced live. Combat/Magic/Task pools update in real time.
+4. **Magic resolution** — shown only for Awakened builds (Full Magic, Adept). Full Magic: pick spell categories. Adept: spend magic points on powers from `adept_powers.json`.
+5. **Skill allocation** — point-buy within skill pool; active + knowledge skills; concentration picker for eligible skills.
+6. **Resource spend** — budget display; user browses gear/cyberware/spells catalogs and adds items; Essence tracker for cyberware; remaining nuyen shown.
+7. **Identity** — name, background, contacts (can auto-generate each section or type manually).
+8. **Review & confirm** — full summary, validation errors surfaced inline, confirm → Character Sheet.
+
+**Engine integration:**
+- Each step calls the same pure stage functions the generator uses, but with user-supplied values instead of RNG choices.
+- Validation runs continuously (no invalid state allowed past each step).
+- The resulting `Character` is identical in shape to a generated one — same sheet, same PDF export, same character code.
+
+**Character code for manual builds:** encode as `m:<archetype>:<priority-string>:<seed>` where seed is a timestamp hash; round-trips through Load on the landing screen.
+
+**Exit criteria:** all five metatypes and all 14 archetypes are reachable; completed builds pass `validate()`; character code round-trips; PDF export works.
+
+### Phase 9 — QoL (v3 candidate, park here for now)
+- localStorage character gallery (save/name/load multiple runners)
+- Share link (URL fragment encoding of character code)
+- Quiz axis radar chart (dodecagon, six axes, was in v1 plan)
+- SR1 support
+
 ## Phases
 
 ### Phase 0 — Scaffolding (DONE)
@@ -83,11 +147,11 @@ A static web app that produces playable, rules-valid Shadowrun 2nd Edition chara
 3. Smoke-test the deployed bundle.
 
 ## Backlog
-- **Physical adept powers**: Adepts have Magic attribute modeled but powers (Improved Reflexes, Killing Hands, etc.) are not purchased from resources — adept resource spend currently mirrors mundane archetypes.
+_(v1 backlog cleared 2026-05-05)_
 
 ## Status
 
-**Phases 1–6 complete plus backlog tuning pass** (2026-05-05). All v1 milestones done plus:
+**v1 complete + v2 plan drafted** (2026-05-05). All v1 milestones done plus:
 - Archetype tuning: `former_company_man` body/quickness/strength weights balanced; `rigger` quickness/intelligence weights equalized; `mercenary` and `combat_mage` gearTags corrected against canonical gear (p.55, p.52, p.60).
 - Resource budget reserve: 500¥ held back before tagged gear loop so weapon guarantee always has budget.
 - Concentration validation: WEAPON_CONC_CATS extended to cover gunnery (Machine Guns, Assault Cannon), projectile_weapons (Bows, Crossbows), and throwing_weapons (Shafted, Non-Aerodynamic, Aerodynamic).
@@ -101,7 +165,7 @@ App live at https://gruevyhat.github.io/shadowrun-2.0-chargen/
 - Dark terminal theme (#060c09 bg, #00ffcc neon, Courier) to match the web app's SR aesthetic.
 - FASA watermark footer with character code for traceability.
 
-**Next:** physical adept powers, or v2 planning.
+**Next:** Phase 7a (Grimoire 2e adept power verification) or Phase 8 (manual builder wizard).
 
 ## Risks & mitigations
 - **OCR quality on a 71MB scanned PDF**: mitigated by 400dpi, `--psm 1`, and per-section manual review. Tables (priority, gear, spells) are highest risk; budget hand-transcription time for those.
