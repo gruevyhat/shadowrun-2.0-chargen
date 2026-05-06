@@ -151,6 +151,8 @@ _(v1 backlog cleared 2026-05-05)_
 
 ## Status
 
+**Phase 8 done** (2026-05-06). Manual character builder wizard live. Next: Phase 9 (QoL) or Phase 7 (supplement data).
+
 **v1 complete + v2 plan drafted** (2026-05-05). All v1 milestones done plus:
 - Archetype tuning: `former_company_man` body/quickness/strength weights balanced; `rigger` quickness/intelligence weights equalized; `mercenary` and `combat_mage` gearTags corrected against canonical gear (p.55, p.52, p.60).
 - Resource budget reserve: 500¥ held back before tagged gear loop so weapon guarantee always has budget.
