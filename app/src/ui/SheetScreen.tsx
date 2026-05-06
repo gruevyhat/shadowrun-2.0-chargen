@@ -484,7 +484,7 @@ export function SheetScreen() {
           </div>
         </div>
         <div className="sheet-header-right">
-          <button className="seed-display" onClick={handleCopySeed} title="Click to copy character seed">
+          <button className="seed-display" onClick={handleCopySeed} title={characterCode}>
             <span className="seed-label">SEED</span>
             <span className="seed-value">{copied ? 'COPIED' : characterCode}</span>
           </button>
