@@ -113,6 +113,15 @@
     { "id": "stimulant_patch",     "name": "Stimulant Patch (Rating 4)",   "category": "misc",            "costNuyen": 400,   "weightKg": 0.01  },
     { "id": "trauma_patch",        "name": "Trauma Patch",                 "category": "misc",            "costNuyen": 500,   "weightKg": 0.02  },
     { "id": "det_cord",            "name": "Detonation Cord (10m)",        "category": "misc",            "costNuyen": 50,    "weightKg": 0.50  },
-    { "id": "rope_10m",            "name": "Rappelling Line (10m)",        "category": "misc",            "costNuyen": 50,    "weightKg": 1.00  }
+    { "id": "rope_10m",            "name": "Rappelling Line (10m)",        "category": "misc",            "costNuyen": 50,    "weightKg": 1.00  },
+
+    { "id": "laser_crescent_axe",  "name": "Laser Crescent Axe",         "category": "meleeWeapon",     "costNuyen": 3500,  "concealability": 2,  "damageCode": "(Str)S",  "reach": 1, "notes": "Self-focusing welding laser on crescent blade. Targets Immunity to Normal Weapons.", "weightKg": 2.0,   "source": "SSC p.8" },
+    { "id": "flash_grenade",       "name": "Flash Grenade (AFR-7)",      "category": "explosive",       "costNuyen": 40,    "concealability": 9,  "damageCode": "5L",  "fireMode": "Thrown", "ranges": [5,10,15,20], "notes": "Blast 1m (5L damage); flash to 30m (+6 target mod, -1 per 5m; -50% with flare comp). Lasts 5 turns.", "weightKg": 2.5,   "source": "SSC p.45" },
+    { "id": "flash_pak",           "name": "Flash-Pak",                  "category": "misc",            "costNuyen": 250,   "notes": "Reusable. +4 target mod to ranged attacks (or +2 with flare comp). -1 per 5m from device.", "weightKg": 2.0,   "source": "SSC p.46" },
+    { "id": "narcoject_pistol",    "name": "Narcoject Pistol",           "category": "pistol",          "costNuyen": 600,   "concealability": 4,  "damageCode": "Toxin","ammoCapacity": 5,   "fireMode": "SA",       "ranges": [5,15,30,50],  "notes": "Fires Narcoject darts (toxin delivery). Resolve with Combat Pool dice only.", "weightKg": 1.5,   "source": "SSC p.63" },
+    { "id": "narcoject_rifle",     "name": "Narcoject Rifle",            "category": "rifle",           "costNuyen": 1700,  "concealability": 4,  "damageCode": "Toxin","ammoCapacity": 10,  "fireMode": "SA",       "ranges": [5,20,40,60],  "notes": "Fires Narcoject darts (toxin delivery). Resolve with Combat Pool dice only.", "weightKg": 3.25,  "source": "SSC p.63" },
+    { "id": "security_armor_light","name": "Security Armor (Light)",     "category": "armor",           "costNuyen": 7500,  "armorBallistic": 6,  "armorImpact": 4,    "notes": "NA concealability. Kelmar Tech. Optional helmet +250¥.", "weightKg": 9.0,   "source": "SSC p.71" },
+    { "id": "security_armor_med",  "name": "Security Armor (Medium)",   "category": "armor",           "costNuyen": 9000,  "armorBallistic": 6,  "armorImpact": 5,    "notes": "NA concealability. Kelmar Tech. Optional helmet +250¥.", "weightKg": 11.0,  "source": "SSC p.71" },
+    { "id": "security_armor_heavy","name": "Security Armor (Heavy)",     "category": "armor",           "costNuyen": 12000, "armorBallistic": 7,  "armorImpact": 5,    "notes": "NA concealability. Kelmar Tech. Optional helmet +250¥.", "weightKg": 13.0,  "source": "SSC p.71" }
   ]
 }
